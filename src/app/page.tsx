@@ -18,195 +18,479 @@ const TOOLS = [
 ];
 
 const FEATURES = [
-  { icon: '⚡', title: 'Instant Analysis', desc: 'Checks plan fit, team size alignment, and cross-vendor alternatives in under 1 second.' },
-  { icon: '💰', title: 'Exact Dollar Amounts', desc: 'Real current pricing from every vendor. Not vague advice — specific savings numbers.' },
-  { icon: '🤖', title: 'AI-Written Summary', desc: 'A personalized paragraph from Claude explaining your biggest cost opportunities.' },
+  {
+    icon: '⚡',
+    title: 'Instant Analysis',
+    desc: 'Checks plan fit, team size alignment, and cross-vendor alternatives in under 1 second.',
+  },
+  {
+    icon: '💰',
+    title: 'Exact Dollar Amounts',
+    desc: 'Real current pricing from every vendor. Not vague advice — specific savings numbers.',
+  },
+  {
+    icon: '🤖',
+    title: 'AI-Written Summary',
+    desc: 'A personalized paragraph from Claude explaining your biggest cost opportunities.',
+  },
+];
+
+const STEPS = [
+  {
+    num: '01',
+    title: 'Add your tools',
+    desc: 'Select the AI tools your team pays for. Takes 60 seconds.',
+  },
+  {
+    num: '02',
+    title: 'Get instant audit',
+    desc: 'Our engine checks plan fit, team size, and cross-vendor alternatives in real-time.',
+  },
+  {
+    num: '03',
+    title: 'See your savings',
+    desc: 'Get exact dollar amounts, not vague advice. Act immediately to cut costs.',
+  },
 ];
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen relative overflow-x-hidden bg-[#05050C] text-white font-sans">
-      {/* Decorative Background Glows (Ambient Orbs) */}
-      <div className="pointer-events-none absolute top-0 left-1/4 -translate-x-1/2 w-[600px] h-[600px] bg-brand-purple/20 blur-[130px] rounded-full opacity-40 z-0" />
-      <div className="pointer-events-none absolute top-[30%] right-1/4 translate-x-1/2 w-[500px] h-[500px] bg-brand-cyan/15 blur-[120px] rounded-full opacity-30 z-0" />
-      <div className="pointer-events-none absolute top-[60%] left-1/3 w-[600px] h-[600px] bg-brand-purple/10 blur-[150px] rounded-full opacity-20 z-0" />
-      <div className="pointer-events-none absolute bottom-0 right-10 w-[700px] h-[700px] bg-brand-cyan/10 blur-[180px] rounded-full opacity-25 z-0" />
+    <main className="min-h-screen relative overflow-x-hidden" style={{ background: 'var(--surface-0)', color: 'var(--text-primary)' }}>
 
-      {/* Nav */}
-      <nav className="relative z-20 flex items-center justify-between px-6 py-6 max-w-6xl mx-auto w-full">
-        <div className="flex items-center gap-2.5 group cursor-pointer">
-          <span className="text-2xl group-hover:scale-110 group-hover:rotate-12 transition-transform duration-300">🔍</span>
-          <span className="font-extrabold text-2xl tracking-tight text-white">
-            <span className="gradient-text font-black">Spend</span>Lens
-          </span>
-          <span className="glass rounded-full px-3 py-1 text-[10px] uppercase font-bold tracking-wider text-gray-400 ml-2 border-white/5 bg-white/5 hidden sm:inline-block">by Credex</span>
-        </div>
-        <div className="hidden sm:flex items-center gap-6 text-sm font-medium text-gray-300 bg-white/5 px-5 py-2 rounded-full border border-white/10 glass shadow-lg">
-          <span className="flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-brand-green animate-pulse" /> Free forever</span>
-          <span className="w-px h-4 bg-white/10" />
-          <span>No signup required</span>
+      {/* ── Ambient background glows ───────────────────────────────────────── */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none',
+          background: 'var(--gradient-hero)',
+        }}
+      />
+      <div aria-hidden="true" style={{
+        position: 'absolute', top: '-120px', left: '50%', transform: 'translateX(-60%)',
+        width: '800px', height: '800px', borderRadius: '50%',
+        background: 'hsla(262, 75%, 60%, 0.09)',
+        filter: 'blur(120px)', zIndex: 0, pointerEvents: 'none',
+      }} />
+      <div aria-hidden="true" style={{
+        position: 'absolute', top: '45%', right: '-200px',
+        width: '600px', height: '600px', borderRadius: '50%',
+        background: 'hsla(190, 85%, 50%, 0.06)',
+        filter: 'blur(100px)', zIndex: 0, pointerEvents: 'none',
+      }} />
+
+      {/* ── Nav ────────────────────────────────────────────────────────────── */}
+      <nav style={{ position: 'relative', zIndex: 20 }}>
+        <div style={{
+          maxWidth: '1152px', margin: '0 auto', padding: '0 32px',
+          height: '72px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        }}>
+          {/* Logo */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{
+              width: '34px', height: '34px', borderRadius: '9px',
+              background: 'linear-gradient(135deg, var(--brand-purple), var(--brand-cyan))',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '17px',
+            }}>🔍</div>
+            <span style={{
+              fontFamily: 'var(--font-sans)', fontWeight: 800,
+              fontSize: '18px', letterSpacing: '-0.02em', color: 'var(--text-primary)',
+            }}>
+              <span className="gradient-text">Spend</span>Lens
+            </span>
+            <span style={{
+              fontFamily: 'var(--font-mono)', fontSize: '10px', fontWeight: 500,
+              letterSpacing: '0.08em', textTransform: 'uppercase',
+              color: 'var(--text-muted)', border: '1px solid var(--border)',
+              borderRadius: '100px', padding: '3px 10px',
+            }}>by Credex</span>
+          </div>
+
+          {/* Nav pill */}
+          <div className="glass" style={{
+            display: 'flex', alignItems: 'center', gap: '20px',
+            padding: '10px 20px', borderRadius: '100px',
+            fontSize: '13px', fontWeight: 500, color: 'var(--text-secondary)',
+          }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{
+                width: '7px', height: '7px', borderRadius: '50%',
+                background: 'var(--brand-green)',
+                animation: 'pulseDot 2s ease-in-out infinite',
+                display: 'inline-block',
+              }} />
+              Free forever
+            </span>
+            <span style={{ width: '1px', height: '16px', background: 'var(--border)' }} />
+            <span>No signup required</span>
+          </div>
         </div>
       </nav>
 
-      {/* Hero */}
-      <section className="relative z-10 text-center px-6 pt-24 pb-28 max-w-5xl mx-auto w-full flex flex-col items-center">
-        {/* Glowing Badge */}
-        <div className="glass inline-flex items-center gap-3 rounded-full px-5 py-2.5 mb-10 text-xs font-semibold uppercase tracking-widest text-brand-cyan border-brand-cyan/20 bg-brand-cyan/5 shadow-[0_0_15px_rgba(34,211,238,0.1)] animate-fade-up">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-cyan opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-cyan"></span>
-          </span>
-          SpendLens 1.0 — Free Startup AI Cost Audit
+      {/* ── Hero ────────────────────────────────────────────────────────────── */}
+      <section style={{
+        position: 'relative', zIndex: 10,
+        maxWidth: '1000px', margin: '0 auto',
+        padding: '96px 32px 128px',   /* pt-24 pb-32 equivalent */
+        textAlign: 'center',
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+      }}>
+
+        {/* Launch badge */}
+        <div
+          className="animate-fade-up glass"
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: '10px',
+            padding: '7px 18px', borderRadius: '100px',
+            borderColor: 'hsla(190, 85%, 52%, 0.2)',
+            background: 'hsla(190, 85%, 52%, 0.04)',
+            fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 500,
+            letterSpacing: '0.07em', textTransform: 'uppercase',
+            color: 'var(--brand-cyan)', marginBottom: '48px',
+          }}
+        >
+          <span style={{
+            width: '6px', height: '6px', borderRadius: '50%',
+            background: 'var(--brand-cyan)', display: 'inline-block',
+            animation: 'pulseDot 2s ease-in-out infinite',
+          }} />
+          SpendLens 1.0 — Free AI Cost Audit for Startups
         </div>
 
-        {/* Big Bold Heading */}
-        <h1 className="text-5xl sm:text-7xl md:text-8xl font-black tracking-tighter mb-8 leading-[1.05] text-white animate-fade-up" style={{ animationDelay: '0.1s' }}>
+        {/* Main headline — editorial, display font */}
+        <h1
+          className="animate-fade-up"
+          style={{
+            fontFamily: 'var(--font-display)', fontStyle: 'italic',
+            fontSize: 'clamp(52px, 8vw, 84px)',
+            lineHeight: 0.95, letterSpacing: '-0.02em',
+            color: 'var(--text-primary)',
+            marginBottom: '36px',
+            animationDelay: '0.12s',
+          }}
+        >
           Stop burning cash<br />
-          on <span className="gradient-text bg-gradient-to-r from-brand-purple via-pink-500 to-brand-cyan">AI subscriptions</span>
+          on{' '}
+          <span className="gradient-text" style={{ fontStyle: 'italic' }}>
+            AI subscriptions
+          </span>
         </h1>
 
-        {/* Subtitle */}
-        <p className="text-lg md:text-2xl text-gray-400 max-w-3xl mx-auto mb-14 leading-relaxed font-light animate-fade-up" style={{ animationDelay: '0.2s' }}>
+        {/* Subheadline */}
+        <p
+          className="animate-fade-up"
+          style={{
+            fontFamily: 'var(--font-sans)', fontWeight: 500,
+            fontSize: 'clamp(16px, 2.2vw, 20px)',
+            lineHeight: 1.7, color: 'var(--text-secondary)',
+            maxWidth: '680px', marginBottom: '56px',
+            animationDelay: '0.22s',
+          }}
+        >
           Enter your team&apos;s AI tools and get an instant audit — showing exactly where
-          you&apos;re overpaying and how to save thousands.
+          you&apos;re overpaying and how much you can save.
         </p>
 
-        {/* Call to Actions */}
-        <div className="flex flex-col sm:flex-row gap-5 justify-center items-center animate-fade-up w-full max-w-md sm:max-w-none" style={{ animationDelay: '0.3s' }}>
+        {/* CTAs */}
+        <div
+          className="animate-fade-up"
+          style={{
+            display: 'flex', flexWrap: 'wrap',
+            gap: '16px', justifyContent: 'center', alignItems: 'center',
+            marginBottom: '80px',
+            animationDelay: '0.32s',
+          }}
+        >
           <Link
             href="/audit/new"
             id="cta-hero-start"
-            className="btn-primary btn-primary--lg text-lg px-12 py-5 rounded-2xl w-full sm:w-auto shadow-[0_0_30px_rgba(168,85,247,0.3)] hover:shadow-[0_0_40px_rgba(168,85,247,0.5)] transition-all duration-300"
+            className="btn-primary btn-primary--lg"
           >
-            Start Free Audit <span className="inline-block group-hover:translate-x-1 transition-transform ml-1">→</span>
+            Start Free Audit
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginLeft: '2px' }}>
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
           </Link>
-          <span className="text-gray-400 text-sm font-medium bg-white/5 px-5 py-3 rounded-2xl border border-white/10 glass w-full sm:w-auto text-center">
-            ⚡ 2 mins · Instant audit · No card
+          <span style={{
+            fontFamily: 'var(--font-mono)', fontSize: '12px', fontWeight: 500,
+            color: 'var(--text-muted)', letterSpacing: '0.04em',
+            padding: '12px 20px', borderRadius: '8px',
+            border: '1px solid var(--border)',
+            background: 'transparent',
+          }}>
+            2 min · instant results · no credit card
           </span>
         </div>
 
-        {/* Floating Tool Chips */}
-        <div className="mt-24 flex flex-wrap justify-center gap-3.5 max-w-3xl mx-auto animate-fade-up" style={{ animationDelay: '0.4s' }}>
+        {/* Tool chips strip */}
+        <div
+          className="animate-fade-up"
+          style={{
+            display: 'flex', flexWrap: 'wrap', gap: '10px',
+            justifyContent: 'center', maxWidth: '680px',
+            animationDelay: '0.42s',
+          }}
+        >
           {TOOLS.map((t, i) => (
-            <span 
-              key={t.name} 
-              className="glass rounded-full px-5 py-2.5 text-sm font-medium text-gray-300 flex items-center gap-2 hover:bg-white/10 hover:border-white/20 transition-all duration-300 cursor-default border-white/10 shadow-sm"
-              style={{ animation: `float 6s ease-in-out infinite`, animationDelay: `${i * 0.2}s` }}
+            <span
+              key={t.name}
+              className="glass"
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: '7px',
+                padding: '8px 16px', borderRadius: '100px',
+                fontFamily: 'var(--font-sans)', fontSize: '13px', fontWeight: 500,
+                color: 'var(--text-secondary)',
+                animation: `float 7s ease-in-out infinite`,
+                animationDelay: `${i * 0.18}s`,
+                transition: 'border-color 0.2s, color 0.2s',
+              }}
             >
-              <span className="text-lg">{t.emoji}</span> {t.name}
+              <span style={{ fontSize: '15px' }}>{t.emoji}</span>
+              {t.name}
             </span>
           ))}
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="relative z-10 px-6 py-28 max-w-6xl mx-auto w-full">
-        {/* Section Header */}
-        <div className="text-center mb-20 animate-fade-up">
-          <span className="text-xs font-bold tracking-widest text-brand-purple uppercase bg-brand-purple/10 px-4 py-1.5 rounded-full border border-brand-purple/20">
+      {/* ── Features ────────────────────────────────────────────────────────── */}
+      <section style={{
+        position: 'relative', zIndex: 10,
+        maxWidth: '1152px', margin: '0 auto',
+        padding: '80px 32px 120px',
+      }}>
+        {/* Section header */}
+        <div style={{ textAlign: 'center', marginBottom: '72px' }}>
+          <span className="section-label section-label--purple animate-fade-up">
             Capabilities
           </span>
-          <h2 className="text-3xl md:text-5xl font-extrabold mt-5 text-white tracking-tight">
+          <h2
+            className="animate-fade-up"
+            style={{
+              fontFamily: 'var(--font-display)', fontStyle: 'italic',
+              fontSize: 'clamp(36px, 5vw, 54px)',
+              lineHeight: 1.0, letterSpacing: '-0.02em',
+              color: 'var(--text-primary)',
+              marginTop: '24px', marginBottom: '18px',
+              animationDelay: '0.1s',
+            }}
+          >
             Engineered for immediate clarity
           </h2>
-          <p className="text-gray-400 text-lg md:text-xl font-light mt-3 max-w-2xl mx-auto">
-            Our audit engine performs deep-dive checks to spot leaks in your operational AI budget.
+          <p
+            className="animate-fade-up"
+            style={{
+              fontFamily: 'var(--font-sans)', fontWeight: 500,
+              fontSize: '17px', color: 'var(--text-secondary)',
+              lineHeight: 1.7, maxWidth: '520px', margin: '0 auto',
+              animationDelay: '0.18s',
+            }}
+          >
+            Deep-dive checks that spot leaks in your AI operational budget — instantly.
           </p>
         </div>
 
-        {/* Feature Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* Cards grid */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: '24px',
+        }}>
           {FEATURES.map((f, i) => (
             <div
               key={f.title}
-              className="card p-9 group hover:-translate-y-2.5 transition-all duration-300 relative overflow-hidden bg-gradient-to-b from-white/[0.04] to-transparent"
-              style={{ animationDelay: `${i * 0.15}s` }}
+              className="card card--featured-purple"
+              style={{
+                padding: '36px',
+                animationDelay: `${i * 0.12}s`,
+                position: 'relative', overflow: 'hidden',
+              }}
             >
-              {/* Subtle top light reflection line */}
-              <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-              
-              <div className="text-4xl mb-7 bg-white/5 w-16 h-16 flex items-center justify-center rounded-2xl border border-white/10 group-hover:scale-110 group-hover:border-brand-purple/30 group-hover:bg-brand-purple/5 transition-all duration-300 shadow-inner">
+              {/* Icon */}
+              <div style={{
+                width: '52px', height: '52px', borderRadius: '12px',
+                background: 'hsla(262, 75%, 62%, 0.08)',
+                border: '1px solid hsla(262, 75%, 62%, 0.15)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '24px', marginBottom: '28px',
+                transition: 'all 0.3s ease',
+              }}>
                 {f.icon}
               </div>
-              <h3 className="font-bold text-2xl mb-4 text-white group-hover:text-brand-cyan transition-colors duration-200">{f.title}</h3>
-              <p className="text-gray-400 text-base leading-relaxed font-light">{f.desc}</p>
+              <h3 style={{
+                fontFamily: 'var(--font-sans)', fontWeight: 700,
+                fontSize: '18px', letterSpacing: '-0.01em',
+                color: 'var(--text-primary)', marginBottom: '12px',
+              }}>
+                {f.title}
+              </h3>
+              <p style={{
+                fontFamily: 'var(--font-sans)', fontWeight: 500,
+                fontSize: '15px', lineHeight: 1.7,
+                color: 'var(--text-secondary)',
+              }}>
+                {f.desc}
+              </p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* How it Works Section */}
-      <section className="relative z-10 px-6 py-28 max-w-4xl mx-auto w-full">
-        {/* Section Header */}
-        <div className="text-center mb-24">
-          <span className="text-xs font-bold tracking-widest text-brand-cyan uppercase bg-brand-cyan/10 px-4 py-1.5 rounded-full border border-brand-cyan/20">
+      {/* ── How it Works ─────────────────────────────────────────────────────── */}
+      <section style={{
+        position: 'relative', zIndex: 10,
+        maxWidth: '800px', margin: '0 auto',
+        padding: '80px 32px 128px',
+      }}>
+        {/* Section header */}
+        <div style={{ textAlign: 'center', marginBottom: '80px' }}>
+          <span className="section-label section-label--cyan">
             Process
           </span>
-          <h2 className="text-3xl md:text-5xl font-extrabold mt-5 text-white tracking-tight">How it works</h2>
-          <p className="text-gray-400 text-lg md:text-xl font-light mt-3">Three simple steps to optimize your startup's AI stack.</p>
+          <h2 style={{
+            fontFamily: 'var(--font-display)', fontStyle: 'italic',
+            fontSize: 'clamp(36px, 5vw, 54px)',
+            lineHeight: 1.0, letterSpacing: '-0.02em',
+            color: 'var(--text-primary)',
+            marginTop: '24px', marginBottom: '18px',
+          }}>
+            How it works
+          </h2>
+          <p style={{
+            fontFamily: 'var(--font-sans)', fontWeight: 500,
+            fontSize: '17px', color: 'var(--text-secondary)',
+            lineHeight: 1.7,
+          }}>
+            Three steps. Under two minutes.
+          </p>
         </div>
-        
-        {/* Steps Timeline */}
-        <div className="relative space-y-12">
-          {/* Vertical timeline connecting line */}
-          <div className="absolute left-10 sm:left-[50px] top-12 bottom-12 w-[2px] bg-gradient-to-b from-brand-purple/40 via-brand-cyan/30 to-white/5 hidden xs:block pointer-events-none z-0" />
 
-          {[
-            { step: '01', title: 'Add your tools', desc: 'Select the AI tools your team pays for — takes exactly 60 seconds.' },
-            { step: '02', title: 'Get instant audit', desc: 'Our engine checks plan fit, team size, and cross-vendor alternatives in real-time.' },
-            { step: '03', title: 'See your savings', desc: 'Get exact dollar amounts, not vague advice. Act immediately to cut costs.' },
-          ].map((item, i) => (
-            <div 
-              key={item.step} 
-              className="card p-8 flex flex-col xs:flex-row items-start xs:items-center gap-6 sm:gap-8 group hover:border-brand-purple/40 hover:bg-white/[0.03] transition-all duration-300 relative z-10 bg-gradient-to-r from-white/[0.03] to-transparent"
+        {/* Steps */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {STEPS.map((item, i) => (
+            <div
+              key={item.num}
+              className="card"
+              style={{
+                padding: '32px 36px',
+                display: 'flex', alignItems: 'center', gap: '32px',
+                animationDelay: `${i * 0.12}s`,
+                background: 'var(--gradient-card)',
+              }}
             >
-              {/* Number circular badge */}
-              <div className="flex-shrink-0 w-16 h-16 sm:w-24 sm:h-24 rounded-2xl bg-[#090918] flex items-center justify-center text-brand-purple font-black text-2xl sm:text-4xl border border-white/10 group-hover:scale-105 group-hover:border-brand-purple/40 group-hover:bg-brand-purple/10 group-hover:text-white transition-all duration-300 shadow-md">
-                {item.step}
+              {/* Step number */}
+              <div style={{
+                flexShrink: 0,
+                fontFamily: 'var(--font-mono)', fontWeight: 400,
+                fontSize: 'clamp(40px, 6vw, 64px)', lineHeight: 1,
+                letterSpacing: '-0.03em',
+                color: 'hsla(262, 75%, 62%, 0.5)',
+                userSelect: 'none', minWidth: '64px',
+                transition: 'color 0.3s ease',
+              }}>
+                {item.num}
               </div>
-              <div className="space-y-1.5">
-                <h3 className="text-xl sm:text-2xl font-bold text-white group-hover:text-brand-cyan transition-colors">{item.title}</h3>
-                <p className="text-gray-400 text-sm sm:text-lg font-light leading-relaxed">{item.desc}</p>
+              <div>
+                <h3 style={{
+                  fontFamily: 'var(--font-sans)', fontWeight: 700,
+                  fontSize: '18px', letterSpacing: '-0.01em',
+                  color: 'var(--text-primary)', marginBottom: '8px',
+                }}>
+                  {item.title}
+                </h3>
+                <p style={{
+                  fontFamily: 'var(--font-sans)', fontWeight: 500,
+                  fontSize: '15px', lineHeight: 1.7,
+                  color: 'var(--text-secondary)',
+                }}>
+                  {item.desc}
+                </p>
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Bottom CTA Card */}
-      <section className="relative z-10 px-6 py-24 max-w-4xl mx-auto text-center w-full">
-        <div
-          className="card p-12 md:p-20 relative overflow-hidden bg-gradient-to-b from-[#111128] to-[#080815] border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.8)] rounded-3xl"
-        >
-          {/* Decorative glowing gradient inside card */}
-          <div className="absolute -top-1/2 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-brand-purple/20 blur-[100px] rounded-full pointer-events-none z-0" />
-          
-          <div className="relative z-10 flex flex-col items-center">
-            <h2 className="text-4xl md:text-6xl font-black mb-6 text-white tracking-tight">Ready to find your savings?</h2>
-            <p className="text-lg md:text-2xl text-gray-400 mb-12 font-light max-w-xl">
-              Free. No signup required. No credit card. Just pure savings numbers in under 2 minutes.
-            </p>
-            <Link 
-              href="/audit/new" 
-              id="cta-bottom-start" 
-              className="btn-primary btn-primary--lg text-lg px-14 py-5 rounded-2xl shadow-[0_0_30px_rgba(168,85,247,0.25)] hover:shadow-[0_0_40px_rgba(168,85,247,0.45)] hover:scale-[1.02] transition-all duration-300"
-            >
-              Run My Free Audit →
-            </Link>
-          </div>
+      {/* ── Bottom CTA ───────────────────────────────────────────────────────── */}
+      <section style={{
+        position: 'relative', zIndex: 10,
+        maxWidth: '800px', margin: '0 auto',
+        padding: '0 32px 140px',
+      }}>
+        <div style={{
+          background: 'var(--gradient-cta)',
+          border: '2px solid hsla(74, 222, 128, 0.12)',
+          borderColor: 'hsla(142, 72%, 52%, 0.18)',
+          borderRadius: '20px',
+          padding: '80px 64px',
+          textAlign: 'center',
+          position: 'relative', overflow: 'hidden',
+        }}>
+          {/* Top accent line */}
+          <div style={{
+            position: 'absolute', top: 0, left: 0, right: 0, height: '3px',
+            background: 'var(--gradient-brand)', borderRadius: '20px 20px 0 0',
+          }} />
+
+          <h2 style={{
+            fontFamily: 'var(--font-display)', fontStyle: 'italic',
+            fontSize: 'clamp(34px, 5vw, 52px)',
+            lineHeight: 1.05, letterSpacing: '-0.02em',
+            color: 'var(--text-primary)', marginBottom: '20px',
+          }}>
+            Ready to find your savings?
+          </h2>
+          <p style={{
+            fontFamily: 'var(--font-sans)', fontWeight: 500,
+            fontSize: '17px', lineHeight: 1.7, color: 'var(--text-secondary)',
+            maxWidth: '420px', margin: '0 auto 44px',
+          }}>
+            Free. No account. No credit card. Just answers in under two minutes.
+          </p>
+          <Link
+            href="/audit/new"
+            id="cta-bottom-start"
+            className="btn-primary btn-primary--lg"
+          >
+            Run My Free Audit
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ marginLeft: '2px' }}>
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </Link>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="relative z-10 text-center py-12 text-sm text-gray-500 border-t border-white/5 bg-[#040409]/60 backdrop-blur-lg">
-        <p className="max-w-2xl mx-auto">
-          Built with 💜 by{' '}
-          <a href="https://credex.ai" className="text-gray-300 hover:text-brand-cyan transition-colors font-bold hover:underline">
+      {/* ── Footer ───────────────────────────────────────────────────────────── */}
+      <footer style={{
+        position: 'relative', zIndex: 10,
+        borderTop: '1px solid var(--border)',
+        padding: '48px 32px',
+        textAlign: 'center',
+      }}>
+        <p style={{
+          fontFamily: 'var(--font-sans)', fontWeight: 500,
+          fontSize: '14px', color: 'var(--text-muted)',
+          lineHeight: 1.6,
+        }}>
+          Built with care by{' '}
+          <a
+            href="https://credex.ai"
+            style={{
+              color: 'var(--text-secondary)', fontWeight: 600,
+              textDecoration: 'underline', textUnderlineOffset: '3px',
+              transition: 'color 0.2s',
+            }}
+          >
             Credex
           </a>
-          {' '}— providing discounted AI API credits for high-growth startups.
+          {' '}— discounted AI credits for high-growth startups.
         </p>
-        <p className="text-xs text-gray-600 mt-2">© {new Date().getFullYear()} Credex AI Inc. All rights reserved.</p>
+        <p style={{
+          fontFamily: 'var(--font-mono)', fontSize: '11px',
+          color: 'hsla(215, 15%, 35%, 1)', marginTop: '10px',
+          letterSpacing: '0.03em',
+        }}>
+          © {new Date().getFullYear()} Credex AI Inc.
+        </p>
       </footer>
     </main>
   );
