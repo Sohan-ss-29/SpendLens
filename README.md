@@ -23,11 +23,6 @@
 
 ---
 
-## Screenshots
-
-> *(Add screenshots after Day 4 UI is complete)*
-
----
 
 ## Tech Stack
 
