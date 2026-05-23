@@ -42,9 +42,53 @@ Build the multi-tool spend input form. 8 tools × (plan + spend + seats) = compl
 
 ---
 
-## Day 2 — [DATE] — Spend Input Form
+## Day 2 — May 23, 2026 — Spend Input Form (MVP Feature 1)
 
-*Entry pending — to be written during Day 2 work.*
+**Goal:** Build the full multi-tool spend input form with all 8 AI tools, validation, and localStorage persistence.
+
+### What I built today
+
+- Built `src/components/AuditForm.tsx` — full client-side form using `react-hook-form` + `useFieldArray`
+- Implemented `zodResolver` integration for real-time field validation with specific error messages
+- Built dynamic tool picker grid — click to add/remove tools, max 8, prevents duplicates
+- Each tool card has: plan selector (auto-populates spend based on price × seats), monthly spend input, seats input
+- Seats × plan price auto-calculation: changing seats auto-updates the monthly spend field
+- Plan change auto-calculation: switching plan auto-recalculates spend for current seats
+- localStorage persistence: form state saves on every change, reloads on mount — survives tab switches and refreshes
+- Hid seats input for pure usage-based tools (Anthropic API, OpenAI API direct)
+- Shows minimum seat warnings for plans with seat requirements (Claude Team min 5, etc.)
+- Built `src/app/audit/results/page.tsx` — client-side results reader from sessionStorage
+- Results page shows: big savings hero number, per-tool breakdown cards, Credex CTA when savings > $500/mo
+- Written full audit engine (`src/lib/audit-engine.ts`) with real business rules (early for Day 3)
+- Written 10 unit tests in `src/__tests__/audit-engine.test.ts`
+
+### Decisions made
+
+**Why useFieldArray over a custom state array:**
+`react-hook-form`'s `useFieldArray` gives us free field registration, error state, and re-render optimization. Rolling our own with `useState` would require manually wiring validation — 2x the code for no gain.
+
+**Why sessionStorage for audit results (not URL params):**
+Audit results can be several KB of JSON (8 tools × results object). URL params max out at ~2KB in most browsers. sessionStorage is clean, survives page refresh within a tab, and clears when the user closes — which is the right behavior. Day 5 will add real Supabase persistence + shareable URLs.
+
+**Why auto-calculate spend from seats:**
+Founders often don't know their exact monthly spend — they know their plan and seat count. Auto-calculating from official pricing removes friction. They can override if their billing differs (e.g., annual discount).
+
+**Why show min-seat warnings inline (not on submit):**
+If a user picks Claude Team with 2 seats, they should see immediately that the plan requires 5 seats minimum. Waiting until submit to tell them is frustrating UX.
+
+### Blockers/surprises
+
+- Next.js 16 (installed by default) uses async `params` in dynamic route handlers. Updated `[token]/page.tsx` to use `await params` pattern.
+- Tailwind v4 ships with `@import "tailwindcss"` not `@tailwind base/components/utilities`. Updated globals.css accordingly.
+- `metadataBase` warning in dev: added to layout.tsx to resolve OG image URL resolution.
+
+### Tomorrow (Day 3)
+
+- Full audit engine with all per-tool rules (already started today)
+- 5+ tests covering edge cases: 1 user, max plan already optimal, API-only users, cross-tool redundancy
+- Write `PRICING_DATA.md` with all vendor URLs cited
+- Connect form submission to real API route (`/api/audit`)
+- Save results to Supabase
 
 ---
 
