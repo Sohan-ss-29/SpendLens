@@ -10,18 +10,30 @@ interface StoredResult {
   results: AuditResult[];
   totalMonthlySavings: number;
   totalAnnualSavings: number;
+  aiSummary?: string;
   createdAt: string;
 }
 
 export default function ResultsPage() {
   const [data, setData] = useState<StoredResult | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     try {
       const stored = sessionStorage.getItem('spendlens_audit_result');
       if (stored) setData(JSON.parse(stored));
     } catch { /* ignore */ }
+    setIsLoading(false);
   }, []);
+
+  if (isLoading) {
+    return (
+      <main className="min-h-screen flex flex-col items-center justify-center px-4">
+        <div className="spinner w-8 h-8 mb-4 border-t-white" />
+        <p className="text-gray-400 animate-pulse">Analyzing your AI spend...</p>
+      </main>
+    );
+  }
 
   if (!data) {
     return (
@@ -78,6 +90,18 @@ export default function ResultsPage() {
             </p>
           )}
         </div>
+
+        {/* AI Summary */}
+        {data.aiSummary && (
+          <div className="mt-8 card p-6" style={{ background: 'linear-gradient(135deg, hsla(262,83%,20%,.2) 0%, hsla(198,100%,20%,.1) 100%)', borderColor: 'hsla(262,83%,58%,.2)' }}>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-xl">🤖</span>
+              <h2 className="font-bold">AI Analysis</h2>
+              <span className="badge badge-optimal ml-auto text-xs py-0.5 px-2">Powered by Claude</span>
+            </div>
+            <p className="text-gray-300 text-sm leading-relaxed">{data.aiSummary}</p>
+          </div>
+        )}
 
         {/* Per-tool results */}
         <div className="space-y-3 mt-8">

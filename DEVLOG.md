@@ -143,13 +143,43 @@ Without the guard, team plans with no `minSeats` defined would always trigger th
 - Generic cheaperTier rule over-triggered initially: for any business plan, it would find individual/pro as cheaper and suggest downgrade regardless of team size. Fixed by adding `isTeamPlan` guard.
 - Two test cases had to be corrected after verifying actual business logic: Cursor Business and Copilot Business for 5-person teams *should* suggest downgrade — the original tests assumed "team plan = optimal" which isn't always true.
 
-### Tomorrow (Day 4)
+### Tomorrow (Day 5)
 
-- Wire form submission to `/api/audit` route (currently returns 501)
-- Add Supabase persistence — save audit to `audits` table, get back a UUID
-- Add AI summary via Anthropic API (claude-haiku — stays under budget)
-- Polish results page with AI summary display and loading state
-- Add type-check pass: `npm run type-check`
+- Build Lead Capture flow
+- Generate Shareable URLs
+- Add email integration (Resend)
+
+---
+
+## Day 4 — May 23, 2026 — API, AI Summary & Supabase
+
+**Goal:** Connect the frontend to a real backend API, add Supabase persistence, and integrate the Anthropic API for AI-generated summaries.
+
+### What I built today
+
+- **API Route (`/api/audit`)**:
+  - Wired up `src/app/api/audit/route.ts` to accept POST requests from the form.
+  - Added full request validation using Zod.
+  - Integrated `runAudit` engine on the backend.
+  - Implemented AI summary generation using the `@anthropic-ai/sdk` and `claude-3-5-haiku-20241022` (via a safe fallback mechanism if keys are missing).
+  - Added Supabase insertion logic to save the audit result to an `audits` table and return a unique UUID.
+- **Frontend Updates**:
+  - Updated `AuditForm.tsx` to asynchronously POST to the new API instead of running logic entirely client-side.
+  - Handled loading states correctly via React Hook Form (`isSubmitting`).
+  - Polished `ResultsPage` (`src/app/audit/results/page.tsx`) to display the new AI Summary section.
+  - Added a clean loading skeleton to the results page while it pulls data from `sessionStorage`.
+- **Infrastructure Fixes**:
+  - Fixed a Next.js build crash caused by Supabase config by adding safe fallback values to `process.env` lookups in `src/lib/supabase.ts`.
+
+### Decisions made
+- Used a resilient API approach: If Supabase keys are missing locally, it logs a warning but still returns the generated audit and a mocked UUID so development isn't blocked.
+- Kept `sessionStorage` as the primary mechanism for passing the result to the `/audit/results` page for instant transitions, while still securing the DB persistence on the backend.
+
+### Tomorrow (Day 5)
+
+- Build lead capture mechanics (email gating for full results if requested).
+- Implement dynamic routing for shareable audit URLs (`/audit/[id]`).
+- Set up Resend for email notifications when a high-value lead completes an audit.
 
 ---
 

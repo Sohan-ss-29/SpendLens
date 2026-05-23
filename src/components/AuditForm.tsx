@@ -6,7 +6,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { auditFormSchema, type AuditFormValues } from '@/lib/validations';
 import { PRICING_DATA, isUsageBased } from '@/lib/pricing-data';
-import { runAudit } from '@/lib/audit-engine';
 import type { ToolId } from '@/types';
 
 const STORAGE_KEY = 'spendlens_audit_form_v1';
@@ -64,11 +63,25 @@ export default function AuditForm() {
   }, [fields, append]);
 
   // ── Submit ───────────────────────────────────────────────────────────────
-  const onSubmit = (data: AuditFormValues) => {
-    const auditResult = runAudit(data);
-    const fullResult = { formData: data, ...auditResult, createdAt: new Date().toISOString() };
-    sessionStorage.setItem('spendlens_audit_result', JSON.stringify(fullResult));
-    router.push('/audit/results');
+  const onSubmit = async (data: AuditFormValues) => {
+    try {
+      const response = await fetch('/api/audit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error('Audit failed');
+      }
+
+      const fullResult = await response.json();
+      sessionStorage.setItem('spendlens_audit_result', JSON.stringify(fullResult));
+      router.push('/audit/results');
+    } catch (err) {
+      console.error('Submission error:', err);
+      alert('Failed to generate audit. Please try again.');
+    }
   };
 
   const watchedTools = watch('tools');
