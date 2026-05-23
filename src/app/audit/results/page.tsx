@@ -58,34 +58,40 @@ export default function ResultsPage() {
       : 'text-blue-400';
 
   return (
-    <main className="min-h-screen pb-20">
+    <main className="min-h-screen pb-20 relative overflow-hidden bg-[#05050C] text-white">
+      {/* Decorative Background Glows */}
+      <div className="pointer-events-none absolute top-0 left-1/4 -translate-x-1/2 w-[550px] h-[550px] bg-brand-purple/15 blur-[120px] rounded-full opacity-35 z-0" />
+      <div className="pointer-events-none absolute bottom-0 right-1/4 translate-x-1/2 w-[450px] h-[450px] bg-brand-cyan/10 blur-[100px] rounded-full opacity-20 z-0" />
+
       {/* Header */}
-      <div className="page-header">
+      <div className="page-header relative z-10">
         <div className="page-header-inner">
-          <Link href="/audit/new" className="back-link">← Edit</Link>
-          <div className="logo-mark">
+          <Link href="/audit/new" className="back-link flex items-center gap-1 hover:text-white transition-colors">
+            <span>←</span> <span>Back to Edit</span>
+          </Link>
+          <div className="logo-mark font-extrabold tracking-tight">
             <span className="text-xl">🔍</span>
-            <span className="font-bold gradient-text">SpendLens</span>
+            <span className="font-black gradient-text">SpendLens</span>
           </div>
-          <div className="w-16" />
+          <div className="w-20 hidden xs:block" />
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 pt-10">
+      <div className="max-w-2xl mx-auto px-4 pt-12 relative z-10">
         {/* Hero savings */}
-        <div className="results-hero">
-          <p className="text-gray-400 text-sm mb-2">Identified monthly savings</p>
-          <div className={`text-6xl font-black mb-1 ${savingsColor}`}>
+        <div className="results-hero relative overflow-hidden shadow-2xl border border-white/5">
+          <p className="text-gray-400 text-sm mb-2 font-medium tracking-wide uppercase">Identified monthly savings</p>
+          <div className={`text-6xl sm:text-7xl font-black mb-2 ${savingsColor} tracking-tight`}>
             ${data.totalMonthlySavings.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
-            <span className="text-2xl text-gray-500">/mo</span>
+            <span className="text-2xl text-gray-500 font-medium">/mo</span>
           </div>
-          <p className="text-gray-400 text-sm">
-            = <span className="text-white font-semibold">
+          <p className="text-gray-400 text-base">
+            = <span className="text-white font-bold bg-white/5 border border-white/10 px-3 py-1 rounded-full text-sm inline-block mt-1">
               ${data.totalAnnualSavings.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}/year
             </span>
           </p>
           {data.totalMonthlySavings === 0 && (
-            <p className="text-sm text-blue-400 mt-3 glass rounded-lg px-4 py-2">
+            <p className="text-sm text-brand-cyan mt-5 glass rounded-2xl px-5 py-3 border-brand-cyan/20">
               ✨ Great news — you&apos;re already spending efficiently!
             </p>
           )}
@@ -93,19 +99,20 @@ export default function ResultsPage() {
 
         {/* AI Summary */}
         {data.aiSummary && (
-          <div className="mt-8 card p-6" style={{ background: 'linear-gradient(135deg, hsla(262,83%,20%,.2) 0%, hsla(198,100%,20%,.1) 100%)', borderColor: 'hsla(262,83%,58%,.2)' }}>
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-xl">🤖</span>
-              <h2 className="font-bold">AI Analysis</h2>
-              <span className="badge badge-optimal ml-auto text-xs py-0.5 px-2">Powered by Claude</span>
+          <div className="mt-8 card p-7 bg-gradient-to-b from-[#14102c]/40 to-transparent border-brand-purple/20 shadow-xl relative overflow-hidden">
+            <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-brand-purple/20 to-transparent" />
+            <div className="flex items-center gap-2.5 mb-4">
+              <span className="text-2xl">🤖</span>
+              <h2 className="font-bold text-xl text-white">AI Analysis</h2>
+              <span className="badge badge-optimal ml-auto text-xs py-1 px-3 border-brand-purple/30 bg-brand-purple/10 text-purple-300">Powered by Claude</span>
             </div>
-            <p className="text-gray-300 text-sm leading-relaxed">{data.aiSummary}</p>
+            <p className="text-gray-300 text-sm sm:text-base leading-relaxed font-light">{data.aiSummary}</p>
           </div>
         )}
 
         {/* Per-tool results */}
-        <div className="space-y-3 mt-8">
-          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">
+        <div className="space-y-4 mt-10">
+          <h2 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">
             Tool-by-tool breakdown
           </h2>
           {data.results.map((result) => (
@@ -115,17 +122,17 @@ export default function ResultsPage() {
 
         {/* Credex CTA */}
         {data.totalMonthlySavings > 500 && (
-          <div className="credex-cta mt-8">
-            <div className="text-2xl mb-2">💡</div>
-            <h3 className="font-bold text-lg mb-1">Save even more with Credex</h3>
-            <p className="text-gray-400 text-sm mb-4">
+          <div className="credex-cta mt-10 p-8 shadow-2xl rounded-3xl relative overflow-hidden">
+            <div className="text-3xl mb-3">💡</div>
+            <h3 className="font-bold text-xl mb-2 text-white">Save even more with Credex</h3>
+            <p className="text-gray-400 text-sm mb-6 leading-relaxed max-w-md mx-auto">
               Get discounted AI API credits through Credex — typically 20–40% off list price for startups.
             </p>
             <a
               href="https://credex.ai"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-primary px-6 py-3 inline-block"
+              className="btn-primary px-8 py-3.5 shadow-[0_0_25px_rgba(168,85,247,0.3)] text-sm"
             >
               Get Discounted Credits →
             </a>
@@ -133,9 +140,9 @@ export default function ResultsPage() {
         )}
 
         {/* Rerun */}
-        <div className="text-center mt-8">
-          <Link href="/audit/new" className="text-sm text-gray-500 hover:text-gray-300 transition-colors underline underline-offset-4">
-            ← Edit tools and re-run
+        <div className="text-center mt-10">
+          <Link href="/audit/new" className="text-sm text-gray-400 hover:text-white transition-colors underline underline-offset-4 font-light">
+            ← Edit tools and re-run audit
           </Link>
         </div>
       </div>
