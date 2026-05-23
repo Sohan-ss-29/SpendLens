@@ -92,9 +92,64 @@ If a user picks Claude Team with 2 seats, they should see immediately that the p
 
 ---
 
-## Day 3 — [DATE] — Audit Engine + Tests
+## Day 3 — May 23, 2026 — Audit Engine + Tests
 
-*Entry pending — to be written during Day 3 work.*
+**Goal:** Complete the full audit engine, write comprehensive PRICING_DATA.md, and build a thorough test suite.
+
+### What I built today
+
+- **Rewrote `src/lib/audit-engine.ts`** — full rule set for all 8 tools:
+  - `auditTool()` → per-tool analysis using helper functions `optimal()` and `downgrade()`
+  - Per-tool rules: Cursor (4 rules), Copilot (2 rules), Claude (4 rules), ChatGPT (3 rules), Gemini (2 rules), Windsurf (3 rules)
+  - Usage-based path for Anthropic API and OpenAI API (no seat logic, just spend monitoring)
+  - Credex opportunity flagging: API spend > $100/mo → flag, > $200/mo → prominent recommendation
+  - Generic fallback rule: find cheaper same-vendor tier when no specific rule matches
+  - $5 threshold on generic rule to avoid noisy micro-recommendations
+- **Cross-tool rules in `runAudit()`:**
+  1. Cursor Pro+ + Copilot → coding teams: flag Copilot as redundant (most expensive redundancy)
+  2. Claude + ChatGPT both paid + non-coding use case → suggest consolidating to one LLM
+  3. Cursor + Windsurf both paid + coding → flag as duplicate AI IDEs
+- **Wrote `PRICING_DATA.md`** — every vendor pricing page cited with URL + date, cross-tool scenario table with exact savings
+- **37 unit tests** in `src/__tests__/audit-engine.test.ts` — all passing:
+  - Shape invariants (annualSavings = 12×, never negative, etc.)
+  - All 8 tools × multiple scenarios
+  - Edge cases: free plans, solo users, minimum seat requirements, max plans
+  - Cross-tool redundancy detection for all 3 rules
+  - 8-tool max-load test
+
+### Test results
+```
+✓ 37 tests pass
+✓ 0 tests fail
+Duration: 644ms
+```
+
+### Decisions made
+
+**Why `optimal()` and `downgrade()` helpers:**
+The engine originally had 6 fields to set for every return. With 20+ return paths, inconsistency crept in (some paths missing `credexOpportunity`, etc.). Extracting helpers ensures every result has the exact same shape and the math (`annualSavings = monthlySavings × 12`) is guaranteed by construction.
+
+**Why $5 threshold on generic downgrade rule:**
+A $2/month savings suggestion is noise — it would confuse users and erode trust in the tool. The $5 minimum prevents silly recommendations like "downgrade from $22/seat to $20/seat for 1 seat" when the numbers are close.
+
+**On the Cursor/Copilot Business plan decision:**
+Both Cursor Business ($40/seat) and Copilot Business ($19/seat) flag as downgradeable for teams of 5. This is the right call: admin dashboard features (policy enforcement, centralized billing, audit logs) are genuinely valuable only for orgs with 20+ engineers and compliance requirements. A 5-person startup doesn't need them and saves $20–29/seat/mo by switching.
+
+**Why use a `minSeats` guard on the generic rule:**
+Without the guard, team plans with no `minSeats` defined would always trigger the generic cheaperTier search, even when the user is correctly on a Team plan. The guard: `if (isTeamPlan && currentTier?.minSeats && tool.seats >= currentTier.minSeats) return false` correctly prevents downgrade suggestions when the user meets the plan requirements.
+
+### Blockers/surprises
+
+- Generic cheaperTier rule over-triggered initially: for any business plan, it would find individual/pro as cheaper and suggest downgrade regardless of team size. Fixed by adding `isTeamPlan` guard.
+- Two test cases had to be corrected after verifying actual business logic: Cursor Business and Copilot Business for 5-person teams *should* suggest downgrade — the original tests assumed "team plan = optimal" which isn't always true.
+
+### Tomorrow (Day 4)
+
+- Wire form submission to `/api/audit` route (currently returns 501)
+- Add Supabase persistence — save audit to `audits` table, get back a UUID
+- Add AI summary via Anthropic API (claude-haiku — stays under budget)
+- Polish results page with AI summary display and loading state
+- Add type-check pass: `npm run type-check`
 
 ---
 
