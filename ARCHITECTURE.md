@@ -141,26 +141,47 @@ Runs on every push to `main` and every PR:
 ## Database Schema
 
 ```sql
--- Stores each completed audit
+-- Stores each completed audit (created on POST /api/audit)
 CREATE TABLE audits (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tools_data JSONB NOT NULL,        -- Raw input: {tool, plan, spend, seats}[]
-  results JSONB NOT NULL,           -- Audit output: {tool, recommendation, savings, reason}[]
+  form_data JSONB NOT NULL,         -- Raw input: {teamSize, useCase, tools[]}
+  results JSONB NOT NULL,           -- Audit output: AuditResult[]
   total_monthly_savings DECIMAL(10,2) NOT NULL DEFAULT 0,
-  total_annual_savings DECIMAL(10,2) GENERATED ALWAYS AS (total_monthly_savings * 12) STORED,
-  share_token VARCHAR(21) UNIQUE,   -- nanoid() for public URL
+  total_annual_savings DECIMAL(10,2) NOT NULL DEFAULT 0,
+  share_token VARCHAR(21) UNIQUE,   -- nanoid(21), set when lead email captured
+  lead_email VARCHAR(320),          -- Set when lead submits email (Day 5)
   ai_summary TEXT,                  -- Claude-generated summary paragraph
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Stores lead capture after audit shown
+-- Stores lead capture (email gate shown AFTER audit results, per spec)
 CREATE TABLE leads (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  audit_id UUID REFERENCES audits(id) ON DELETE SET NULL,
   email VARCHAR(320) NOT NULL,
-  company VARCHAR(255),
-  role VARCHAR(255),
+  company_name VARCHAR(255),
+  role VARCHAR(80),
   team_size INTEGER,
+  audit_id UUID REFERENCES audits(id) ON DELETE SET NULL,
+  total_monthly_savings DECIMAL(10,2),
+  total_annual_savings DECIMAL(10,2),
+  is_high_value BOOLEAN DEFAULT FALSE,  -- TRUE when savings > $500/mo
+  share_token VARCHAR(21),              -- nanoid(21) for their share URL
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Public shareable view (NO PII — only tool data and savings numbers)
+-- Created by POST /api/share, read by GET /audit/[token]
+CREATE TABLE shared_audits (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  share_token VARCHAR(21) UNIQUE NOT NULL,
+  audit_id UUID REFERENCES audits(id) ON DELETE SET NULL,
+  results JSONB NOT NULL,           -- AuditResult[] (no email/company)
+  total_monthly_savings DECIMAL(10,2) NOT NULL,
+  total_annual_savings DECIMAL(10,2) NOT NULL,
+  team_size INTEGER NOT NULL,
+  use_case VARCHAR(20) NOT NULL,
+  tool_count INTEGER NOT NULL,
+  ai_summary TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -168,6 +189,7 @@ CREATE TABLE leads (
 CREATE INDEX idx_audits_share_token ON audits(share_token);
 CREATE INDEX idx_leads_audit_id ON leads(audit_id);
 CREATE INDEX idx_leads_email ON leads(email);
+CREATE INDEX idx_shared_audits_token ON shared_audits(share_token);
 ```
 
 ---

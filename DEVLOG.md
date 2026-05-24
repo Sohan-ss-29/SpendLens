@@ -185,13 +185,52 @@ Without the guard, team plans with no `minSeats` defined would always trigger th
 
 ## Day 4 — [DATE] — Results Page + AI Summary
 
-*Entry pending — to be written during Day 4 work.*
+*See Day 4 entry above (the detailed entry is the second Day 4 block — completed May 23).*
 
 ---
 
-## Day 5 — [DATE] — Lead Capture + Shareable URLs
+## Day 5 — May 24, 2026 — Lead Capture + Shareable URLs (Features 5 & 6)
 
-*Entry pending — to be written during Day 5 work.*
+**Hours worked:** 6
+
+**What I did:**
+
+- **`/api/leads` route** — Full implementation:
+  - Zod schema validation on email (required), company name, role, team size (all optional)
+  - IP-based rate limiting: 5 requests/min per IP (in-memory fallback, Upstash Redis when env var present)
+  - Honeypot field: `<input name="website">` hidden via CSS+aria. Bots fill it, humans don't see it. If non-empty, silently return 200 and drop the lead.
+  - Inserts to Supabase `leads` table (email, company_name, role, team_size, audit_id, share_token, is_high_value)
+  - Updates the `audits` row with lead_email + share_token
+  - Sends Resend confirmation email with shareable link, personalized for high-value (>$500/mo) vs. standard cases
+- **`/api/share` route** — Creates a PII-stripped snapshot in `shared_audits` Supabase table, returns a nanoid(21) token
+- **`src/lib/email.ts`** — Full Resend integration with HTML email template. Graceful fallback (logs a warning and returns false) when RESEND_API_KEY is not set
+- **`src/lib/rate-limit.ts`** — Sliding-window rate limiter. In-memory by default; auto-upgrades to Upstash Redis when env vars are present. Same interface either way — clean abstraction
+- **`LeadCaptureForm` component** — Shown after audit results (never before, per spec). Fields: email (required), company name, role, team size (optional). Honeypot field hidden via CSS + aria-hidden. Post-submit shows share link with one-click copy.
+- **`/audit/results` page** — Integrated `LeadCaptureForm` below the tool breakdown. Wires `auditId` from the API response. Share button in header appears once user submits email.
+- **`/audit/[token]` page** — Full public shareable view:
+  - `generateMetadata()` fetches the audit from Supabase and generates rich OG + Twitter Card meta tags dynamically
+  - Displays all tool savings data, AI summary, and a viral CTA to run your own audit
+  - Zero PII — email and company name never stored in `shared_audits`
+  - Handles 404 (expired/invalid token) gracefully
+
+**What I learned:**
+
+- Zod v4 `transform().pipe()` creates a type where the input and output shapes differ — `react-hook-form`'s `Resolver` type requires input and output to match, causing a TS error. The fix: separate the raw schema from the transform, use `z.input<>` for `useForm<>` and cast the resolver. Tracked in REFLECTION.md as the hardest bug.
+- Next.js App Router's `generateMetadata()` is async-safe — can `await` a Supabase query inside it. The resulting HTML `<meta>` tags are fully server-rendered before the response is sent, which is what makes Twitter/LinkedIn link previews work correctly.
+- Honeypot fields need both CSS hiding (`position: absolute; clip: rect(0,0,0,0)`) AND `tabIndex={-1}` + `autoComplete="off"` to pass accessibility audits and prevent autofill.
+
+**Blockers / what I'm stuck on:**
+
+- TypeScript type mismatch between Zod's transformed output type and react-hook-form's generic resolver — resolved with a `z.input<>` / `z.output<>` split approach.
+- `shared_audits` is a new Supabase table not in the original schema — added the SQL below. Needs to be run in Supabase Dashboard before the share feature works in production.
+
+**Plan for tomorrow (Day 6):**
+
+- Run Lighthouse, fix until Performance ≥ 85, Accessibility ≥ 90, Best Practices ≥ 90
+- Mobile responsive pass
+- Write all entrepreneurial docs: GTM.md, ECONOMICS.md, LANDING_COPY.md, METRICS.md
+- Conduct 3 user interviews (already scheduled — two college network connections + one indie hacker post)
+- Write USER_INTERVIEWS.md with real quotes
 
 ---
 
