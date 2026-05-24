@@ -9,7 +9,7 @@ const isMock = supabaseUrl === 'https://placeholder.supabase.co';
 // A generic mock client that just returns success without making network calls
 const mockClient = {
   from: () => ({
-    insert: () => ({ select: () => ({ single: async () => ({ data: { id: 'mock-id' }, error: null }) }) }),
+    insert: () => ({ select: () => ({ single: async () => ({ data: { id: '00000000-0000-0000-0000-000000000000' }, error: null }) }) }),
     update: () => ({ eq: async () => ({ data: null, error: null }) }),
     select: () => ({ eq: () => ({ single: async () => ({ data: null, error: null }) }) })
   })
