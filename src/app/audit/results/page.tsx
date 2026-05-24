@@ -4,8 +4,10 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getToolEmoji } from '@/lib/pricing-data';
 import type { AuditResult } from '@/types';
+import LeadCaptureForm from '@/components/LeadCaptureForm';
 
 interface StoredResult {
+  id?: string;              // Supabase UUID from /api/audit response
   formData: { teamSize: number; useCase: string; tools: unknown[] };
   results: AuditResult[];
   totalMonthlySavings: number;
@@ -17,6 +19,8 @@ interface StoredResult {
 export default function ResultsPage() {
   const [data, setData] = useState<StoredResult | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [shareToken, setShareToken] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     try {
@@ -25,6 +29,19 @@ export default function ResultsPage() {
     } catch { /* ignore */ }
     setIsLoading(false);
   }, []);
+
+  // Generate share URL as soon as we have a token
+  const shareUrl =
+    shareToken
+      ? `${typeof window !== 'undefined' ? window.location.origin : 'https://spendlens.credex.rocks'}/audit/${shareToken}`
+      : null;
+
+  const handleCopy = async () => {
+    if (!shareUrl) return;
+    await navigator.clipboard.writeText(shareUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   if (isLoading) {
     return (
@@ -77,6 +94,9 @@ export default function ResultsPage() {
     : data.totalMonthlySavings > 100 ? 'var(--brand-amber)'
     : 'var(--brand-cyan)';
 
+  const isHighValue = data.totalMonthlySavings > 500;
+  const isOptimal = data.totalMonthlySavings === 0;
+
   return (
     <main style={{ minHeight: '100vh', background: 'var(--surface-0)', color: 'var(--text-primary)', position: 'relative', overflow: 'hidden' }}>
 
@@ -101,7 +121,27 @@ export default function ResultsPage() {
             <span style={{ fontSize: '16px' }}>🔍</span>
             <span className="gradient-text" style={{ fontWeight: 800, letterSpacing: '-0.02em' }}>SpendLens</span>
           </div>
-          <div style={{ width: '64px' }} />
+          {/* Share button (shown once we have a token) */}
+          {shareUrl ? (
+            <button
+              id="share-audit-btn"
+              type="button"
+              onClick={handleCopy}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: '6px',
+                fontFamily: 'var(--font-mono)', fontSize: '11px', fontWeight: 500,
+                letterSpacing: '0.06em', textTransform: 'uppercase',
+                color: copied ? 'var(--brand-green)' : 'var(--text-muted)',
+                background: 'transparent', border: '1px solid var(--border)',
+                borderRadius: '8px', padding: '6px 12px', cursor: 'pointer',
+                transition: 'color 0.2s, border-color 0.2s',
+              }}
+            >
+              {copied ? '✓ Copied' : '🔗 Share'}
+            </button>
+          ) : (
+            <div style={{ width: '80px' }} />
+          )}
         </div>
       </div>
 
@@ -140,7 +180,7 @@ export default function ResultsPage() {
             fontFamily: 'var(--font-sans)', fontSize: '14px', fontWeight: 500,
             color: 'var(--text-secondary)',
           }}>
-            = {' '}
+            ={' '}
             <span style={{
               fontFamily: 'var(--font-mono)', fontWeight: 500,
               color: 'var(--text-primary)',
@@ -153,7 +193,7 @@ export default function ResultsPage() {
             </span>
           </p>
 
-          {data.totalMonthlySavings === 0 && (
+          {isOptimal && (
             <div style={{
               marginTop: '24px', padding: '14px 20px',
               background: 'hsla(190, 85%, 52%, 0.05)',
@@ -220,35 +260,41 @@ export default function ResultsPage() {
           </div>
         </div>
 
-        {/* ── Credex CTA ───────────────────────────────────────────────── */}
-        {data.totalMonthlySavings > 500 && (
-          <div className="credex-cta" style={{ marginBottom: '48px' }}>
-            <div style={{ fontSize: '28px', marginBottom: '14px' }}>💡</div>
-            <h3 style={{
-              fontFamily: 'var(--font-display)', fontStyle: 'italic',
-              fontSize: '24px', letterSpacing: '-0.02em',
-              color: 'var(--text-primary)', marginBottom: '10px',
-            }}>
-              Save even more with Credex
-            </h3>
+        {/* ── Lead Capture (after value shown — spec requirement) ─────── */}
+        <div style={{ marginBottom: '40px' }}>
+          <LeadCaptureForm
+            auditId={data.id}
+            totalMonthlySavings={data.totalMonthlySavings}
+            totalAnnualSavings={data.totalAnnualSavings}
+            toolCount={data.results.length}
+            isHighValueContext={isHighValue}
+            onShareTokenReceived={(token) => setShareToken(token)}
+          />
+        </div>
+
+        {/* ── Optimal / low-savings notification widget ─────────────── */}
+        {isOptimal && (
+          <div style={{
+            background: 'var(--surface-1)',
+            border: '1px solid var(--border)',
+            borderRadius: '14px',
+            padding: '28px',
+            textAlign: 'center',
+            marginBottom: '40px',
+          }}>
             <p style={{
               fontFamily: 'var(--font-sans)', fontWeight: 500,
-              fontSize: '14px', lineHeight: 1.7, color: 'var(--text-secondary)',
-              maxWidth: '380px', margin: '0 auto 28px',
+              fontSize: '14px', color: 'var(--text-secondary)', lineHeight: 1.6,
+              marginBottom: '6px',
             }}>
-              Get discounted AI API credits through Credex — typically 20–40% off list price for startups.
+              You&apos;re spending well today — but AI pricing changes weekly.
             </p>
-            <a
-              href="https://credex.ai"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary"
-            >
-              Get Discounted Credits
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path d="M2 7h10M9 3.5L12.5 7 9 10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </a>
+            <p style={{
+              fontFamily: 'var(--font-mono)', fontSize: '12px',
+              color: 'var(--text-muted)',
+            }}>
+              We&apos;ll let you know when new optimisations apply to your stack.
+            </p>
           </div>
         )}
 
