@@ -27,15 +27,42 @@ interface SharedAudit {
 async function getSharedAudit(token: string): Promise<SharedAudit | null> {
   try {
     const supabase = createServerClient();
-    const { data, error } = await supabase
+    
+    // First try the shared_audits table (created via explicit share)
+    const { data: sharedData, error: sharedError } = await supabase
       .from('shared_audits')
       .select('*')
       .eq('share_token', token)
       .single();
 
-    if (error || !data) return null;
-    return data as SharedAudit;
-  } catch {
+    if (sharedData && !sharedError) {
+      return sharedData as SharedAudit;
+    }
+
+    // Fallback: check the main audits table (created via lead capture)
+    const { data: auditData, error: auditError } = await supabase
+      .from('audits')
+      .select('*')
+      .eq('share_token', token)
+      .single();
+
+    if (auditError || !auditData) return null;
+
+    // Map to SharedAudit shape, explicitly dropping PII (form_data, lead_email)
+    const toolsData = auditData.form_data?.tools || [];
+    return {
+      share_token: auditData.share_token,
+      results: auditData.results,
+      total_monthly_savings: auditData.total_monthly_savings,
+      total_annual_savings: auditData.total_annual_savings,
+      team_size: auditData.form_data?.teamSize || 1,
+      use_case: auditData.form_data?.useCase || 'General',
+      tool_count: toolsData.length,
+      ai_summary: auditData.ai_summary,
+      created_at: auditData.created_at,
+    };
+  } catch (err) {
+    console.error('Error fetching shared audit:', err);
     return null;
   }
 }
