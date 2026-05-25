@@ -84,8 +84,20 @@ export async function sendAuditConfirmationEmail(params: SendAuditEmailParams): 
 
   try {
     if (!process.env.RESEND_API_KEY) {
-      console.warn('[email] RESEND_API_KEY not set — skipping email send');
-      return false;
+      console.warn('[email] RESEND_API_KEY not set — saving email locally to .local-emails/ directory instead');
+      try {
+        const fs = await import('fs');
+        const path = await import('path');
+        const dir = path.join(process.cwd(), '.local-emails');
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir);
+        const fileName = `${email.replace(/[^a-zA-Z0-9]/g, '_')}-${Date.now()}.html`;
+        fs.writeFileSync(path.join(dir, fileName), html, 'utf-8');
+        console.log(`[email] Saved test email to: ${path.join(dir, fileName)}`);
+        return true; // Pretend it sent successfully so the frontend sees success
+      } catch (err) {
+        console.error('[email] Failed to save local email mock:', err);
+        return false;
+      }
     }
 
     const { error } = await resend.emails.send({

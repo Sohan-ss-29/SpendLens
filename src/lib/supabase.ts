@@ -6,14 +6,10 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholde
 
 const isMock = supabaseUrl === 'https://placeholder.supabase.co';
 
+import { localDbMock } from './local-db';
+
 // A generic mock client that just returns success without making network calls
-const mockClient = {
-  from: () => ({
-    insert: () => ({ select: () => ({ single: async () => ({ data: { id: '00000000-0000-0000-0000-000000000000' }, error: null }) }) }),
-    update: () => ({ eq: async () => ({ data: null, error: null }) }),
-    select: () => ({ eq: () => ({ single: async () => ({ data: null, error: null }) }) })
-  })
-} as any;
+const mockClient = localDbMock;
 
 export const supabase = isMock ? mockClient : createClient(supabaseUrl, supabaseAnonKey);
 
