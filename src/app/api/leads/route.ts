@@ -20,6 +20,11 @@ const leadsSchema = z.object({
   totalMonthlySavings: z.number().min(0),
   totalAnnualSavings: z.number().min(0),
   toolCount: z.number().int().positive(),
+  // Pass the full results so we can create a shared_audits snapshot
+  results: z.array(z.any()).optional(),
+  teamSize2: z.number().int().positive().optional(), // alias for sharing
+  useCase: z.string().optional(),
+  aiSummary: z.string().optional(),
   // Honeypot field — bots fill this in, humans don't see it
   website: z.string().max(0, { message: 'Bot detected.' }).optional(),
 });
@@ -69,6 +74,9 @@ export async function POST(request: NextRequest) {
     totalMonthlySavings,
     totalAnnualSavings,
     toolCount,
+    results,
+    useCase,
+    aiSummary,
     website, // honeypot
   } = parsed.data;
 
@@ -83,7 +91,7 @@ export async function POST(request: NextRequest) {
   // Generate a share token for the public URL
   const shareToken = nanoid(21);
 
-  // ── Persist to Supabase ──────────────────────────────────────────────────────
+  // ── Persist to Supabase / Local DB ──────────────────────────────────────────
   let leadId: string | null = null;
   try {
     const supabase = createServerClient();
@@ -106,9 +114,9 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (leadError) {
-      console.error('[leads] Supabase insert error:', leadError);
+      console.error('[leads] Insert error:', leadError);
     } else {
-      leadId = leadData?.id ?? null;
+      leadId = (leadData as { id: string } | null)?.id ?? null;
     }
 
     // 2. Update the audit record with the share token (if auditId provided)
@@ -122,8 +130,46 @@ export async function POST(request: NextRequest) {
         console.error('[leads] Audit update error:', updateError);
       }
     }
+
+    // 3. ✅ KEY FIX: Create a PII-free snapshot in shared_audits so the share URL works
+    // Fetch the audit from the audits table to get results if not passed directly
+    let auditResults = results;
+    let auditTeamSize = teamSize;
+    let auditUseCase = useCase;
+    let auditSummary = aiSummary;
+
+    if (auditId && !auditResults) {
+      const { data: auditRow } = await supabase
+        .from('audits')
+        .select('*')
+        .eq('id', auditId)
+        .single();
+
+      if (auditRow) {
+        const row = auditRow as Record<string, unknown>;
+        auditResults = row.results as typeof results;
+        const formData = row.form_data as Record<string, unknown> | undefined;
+        auditTeamSize = auditTeamSize ?? (formData?.teamSize as number | undefined);
+        auditUseCase = auditUseCase ?? (formData?.useCase as string | undefined);
+        auditSummary = auditSummary ?? (row.ai_summary as string | undefined);
+      }
+    }
+
+    await supabase.from('shared_audits').insert({
+      share_token: shareToken,
+      audit_id: auditId || null,
+      results: auditResults || [],
+      total_monthly_savings: totalMonthlySavings,
+      total_annual_savings: totalAnnualSavings,
+      team_size: auditTeamSize || teamSize || 1,
+      use_case: auditUseCase || useCase || 'general',
+      tool_count: toolCount,
+      ai_summary: auditSummary || aiSummary || null,
+    });
+
+    console.log(`[leads] Created share URL: /audit/${shareToken}`);
   } catch (err) {
-    console.error('[leads] Supabase unavailable:', err);
+    console.error('[leads] DB error:', err);
     // Continue — email still goes out
   }
 
