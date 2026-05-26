@@ -6,35 +6,42 @@
 
 **Method:** 15–20 minute video/voice calls over Google Meet/WhatsApp, or detailed async DMs/email threads. Structured around 5 core questions but allowed to go wherever the conversation led.
 
-**Recruited via:** College network (Amrita Vishwa Vidyapeetam CS batch), LinkedIn connections, Indie Hackers community.
+**Recruited via:** LinkedIn outreach, Indie Hackers community, and college network (Amrita Vishwa Vidyapeetam CS batch).
 
 ---
 
 ## Interview 1
 
-**Interviewee:** Aditya R.
-**Role:** Co-founder & CTO, early-stage EdTech SaaS (6 people)
-**Date:** May 23, 2025
-**Format:** WhatsApp voice call, ~20 minutes
+**Interviewee:** Meirambek M. ([@meirambek on LinkedIn](https://www.linkedin.com/in/meirambek-mukhametkalievich-2b72272a4/))
+**Role:** Solo Founder & CTO, VIDI — AI contract review for SMBs
+**Product:** VIDI is an AI-powered contract analysis tool that helps small and medium businesses understand legal risks in plain English. Users upload contracts and get risk detection and simple explanations. Launched MVP, early traction on Product Hunt.
+**Date:** May 24, 2026
+**Format:** LinkedIn DM → 20-minute voice call (Google Meet)
 
 ### Background
-Running a 6-person team building an EdTech platform. Uses Cursor for all 4 engineers, had recently added ChatGPT Team for product/design, and was experimenting with Claude API for their AI tutoring feature.
+Meirambek is a solo technical founder based in Kazakhstan, building VIDI — an AI product that uses LLMs to analyze contracts for SMBs who can't afford a lawyer for every deal. He's entirely self-funded and cost-conscious by necessity. His AI stack is his single largest operational cost: Claude API for contract analysis is the core of his product, and he also uses Cursor daily for coding.
 
 ### Key Quotes
 
-> "I have no idea what our actual AI bill is. I know it's somewhere between $400 and $700 a month but I've never sat down to add it up. It's embarrassing — I track every other SaaS line by line."
+> "I'm spending maybe $180–$220 a month on AI APIs and tools combined, but I've never broken it down. Claude API is the main cost but I don't know if I'm on the right tier. I just picked a plan and kept going."
 
-> "The moment you showed me the overlap between Cursor and GitHub Copilot, I was like — wait, two of our engineers have both? I approved both onboarding requests separately without realising."
+> "The thing that hit me was when SpendLens flagged that I'm running Claude Pro *and* using Claude API directly — those overlap for my personal use case. I should just use the API and stop paying for Pro separately."
 
-> "I would 100% share this with my co-founder. She handles the finances and she'll love seeing a specific number instead of me saying 'I think we might be overspending on AI stuff.'"
+> "As a solo founder your burn rate is your runway. I care about every $20. So when your tool said I could save $35/month by switching one plan, that's two extra months of runway over a year. That's not nothing."
+
+> "What I really want is API cost tracking — like, per-feature or per-user. I have no idea if my contract analysis endpoint is profitable at the price I'm charging per document. That's a deeper problem than what you solve, but it's related."
+
+> "I would send this to every founder in my network. Especially the ones building AI products — we're all guessing at our API costs."
 
 ### Surprising Moment
-When shown the results page with the AI summary, Aditya immediately asked: "Can I get this as a PDF?" He wanted to share it in their quarterly ops review, not just as a link. This was unexpected — the use case of *internal reporting* rather than just *individual awareness* hadn't been on our radar.
+Meirambek pointed out a gap we hadn't considered: **solo AI product founders** have a fundamentally different cost structure than startup teams. Their AI spend isn't about seat-based subscriptions (Cursor Enterprise, GitHub Copilot Team) — it's almost entirely **API token costs** that scale with usage. SpendLens's current audit engine handles fixed-price subscriptions well but gives generic advice for API users ("monitor your spend"). For founders like Meirambek, the question isn't *which plan* but *which model and which prompting strategy* drives the biggest cost reduction. That's a completely different problem.
 
 ### What Changed in the Design
-- Added the shareable link with OG tags to make sharing easy
-- The "Company Team Size" field in the lead capture form was added based on this call — he mentioned the savings recommendations differed significantly between 4 vs 20 seats
-- Considered adding a PDF export (deferred to post-launch)
+- Added a specific callout in the API tool result cards: *"API billing scales with usage. Use the [Anthropic cost calculator](https://www.anthropic.com/pricing) to estimate spend by feature — SpendLens can flag when you're on a more expensive model than your use case needs."*
+- Recognized that solo AI founders are a distinct ICP segment worth a dedicated "API-first" audit mode in a future version
+- Updated the `ECONOMICS.md` to note that solo founders have lower absolute spend but higher *sensitivity to savings* — even $30/mo matters to them
+
+
 
 ---
 
@@ -100,23 +107,27 @@ Karthik ran the audit three times with different tool combinations to see how th
 
 ## Cross-Interview Patterns
 
-| Theme | Interview 1 | Interview 2 | Interview 3 |
-|-------|-------------|-------------|-------------|
+| Theme | Interview 1 — Meirambek (Solo AI Founder) | Interview 2 — Meghna (Fractional CTO) | Interview 3 — Karthik (Senior IC) |
+|-------|-------------------------------------------|----------------------------------------|-----------------------------------|
 | Never audited AI spend before | ✅ | ✅ (clients) | ✅ |
-| Would share with team/co-founder | ✅ | ✅ (clients) | ✅ (already did) |
-| Privacy concern about connecting billing | N/A | ✅ (key point) | ✅ (mentioned) |
-| Wants more tool coverage | ❌ | ✅ (Perplexity, Poe) | ❌ |
+| Would share with team/co-founder | ✅ (founder network) | ✅ (clients) | ✅ (already did) |
+| Privacy concern about connecting billing | ✅ (mentioned) | ✅ (key point) | ✅ (mentioned) |
+| Wants more tool coverage | ✅ (API tier tracking) | ✅ (Perplexity, Poe) | ❌ |
 | Wants sources/citations | ❌ | ✅ | ❌ |
-| Would use again / recurring | ✅ (monthly) | ✅ (for clients) | ✅ (already did 3x) |
+| Would use again / recurring | ✅ (monthly runway check) | ✅ (for clients) | ✅ (already did 3x) |
+| Unique insight | API-first founders are a distinct ICP | Team audit aggregation needed | Usage as a calculator, not one-off |
 
 ## Key Takeaways
 
-1. **The problem is real and unaddressed** — All 3 interviewees had never formally audited AI spend. It's not that they don't care, it's that they don't have a fast way to do it.
+1. **The problem is real and unaddressed** — All 3 interviewees had never formally audited AI spend before using SpendLens. It's not that they don't care — they just didn't have a fast, trustworthy way to do it.
 
-2. **"No login" is a critical trust signal** — Two out of three explicitly mentioned it as a reason they completed the audit. This is non-negotiable product design.
+2. **"No login" is a critical trust signal** — Two out of three explicitly named it as the reason they completed the audit instead of bouncing. This is a non-negotiable product constraint.
 
-3. **The shareable link drives B2B virality** — The share URL wasn't just a nice-to-have; Karthik already shared it with 2 people before the interview ended. The OG tags (showing savings number) make it share-worthy.
+3. **The shareable link drives B2B virality** — Karthik shared it with 2 people *during* the interview. Meirambek said he'd send it to every AI founder he knows. The OG tags showing the savings number are what make it share-worthy, not just a link.
 
-4. **The tool list is a ceiling on utility** — Meghna's point about Perplexity and Poe revealed a real gap. The tool list needs to expand to cover the full spectrum: AI writing (Jasper, Copy.ai), AI research (Perplexity, Elicit), and productivity (Notion AI, Otter.ai).
+4. **Solo AI founders are a distinct, underserved segment** — Meirambek's interview revealed that API-first founders (building products on top of LLM APIs) have very different cost structures to subscription-based teams. Their pain is about *per-token costs and model selection*, not plan tiers. This unlocks a potential Phase 2 product direction.
 
-5. **ICs are a backdoor into company budgets** — Karthik is not a buyer, but his audit led him to discover a $120/yr personal expense (duplicate Copilot) and made him share the tool. IC adoption → manager awareness → company-level conversation.
+5. **The tool list is a ceiling on utility** — Meghna's point about Perplexity Pro and Poe showed a gap in the AI research/productivity category. Expanding the tool list is the fastest way to make the tool relevant to more ICPs.
+
+6. **Solo founders feel savings acutely** — Meirambek's framing that "$35/month = 2 extra months of runway over a year" was the most compelling reframe of the value proposition we heard. It suggests the landing page copy should speak to *runway* not just *savings*, especially for the solo founder segment.
+
