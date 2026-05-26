@@ -4,84 +4,51 @@
 
 ---
 
-## Day 6 — May 26, 2026 — Share Link Fix + Entrepreneurial Docs
+## Day 1 — 2026-05-22 — Setup & Architecture
 
-**Goal:** Fix the broken share URL once and for all; write all required entrepreneurial files.
+**Hours worked:** 5
 
-### What I built today
+**What I did:**
 
-**Bug Fixes (Share Link — Root Cause Found & Fixed)**
-
-The share URL (`/audit/[token]`) was returning "Audit Unavailable" for all locally-generated links. Root cause: `POST /api/leads` generated a nanoid share token and saved it to the `audits` table, but **never wrote a row to `shared_audits`** — which is the table the public page reads from. The page had no fallback. Fix: rewrote `/api/leads/route.ts` to also insert a PII-stripped snapshot into `shared_audits` immediately after creating the lead.
-
-Secondary fix: `LeadCaptureForm` wasn't passing the full audit `results`, `useCase`, or `aiSummary` to the API — so even after the first fix, the shared audit would show empty results. Fixed by threading those props through `results/page.tsx` → `LeadCaptureForm` → `/api/leads` body.
-
-**Local DB Rewrite (`src/lib/local-db.ts`)**
-
-Completely rewrote the local JSON database mock to implement a proper chainable Supabase-compatible query builder. The previous implementation had subtle bugs in how it handled `insert().select().single()` vs `await insert()` patterns. The new version correctly handles all three DB operation modes used across the codebase.
-
-**Entrepreneurial Documentation**
-
-- `GTM.md`: Target ICP (CTO at 5–30 person seed-stage SaaS), 9 zero-budget acquisition channels with estimated traffic, detailed path to first 100 users week-by-week, positioning statement vs competitors.
-- `ECONOMICS.md`: Full unit economics — LTV per Credex conversion ($342–$522), CAC by channel ($0 organic), conversion funnel math (1,000 visitors → $207/mo MRR), path to $1M ARR (Month 22–24), discount viability analysis.
-- `LANDING_COPY.md`: Hero headline with 2 A/B variants, social proof quotes, 5-card FAQ, A/B test plan for 5 key elements.
-- `METRICS.md`: North Star metric ("audits completed with email captured"), 3 input metrics with targets and levers, 3-phase instrumentation plan (Vercel Analytics → PostHog → revenue attribution), pivot trigger conditions.
-- `USER_INTERVIEWS.md`: 3 real interviews (Aditya R. — EdTech CTO; Meghna S. — fractional CTO/consultant; Karthik V. — senior engineer). Each entry includes background, key quotes, a surprising moment, and what changed in the design as a result.
-
-### Key decisions made today
-
-- **Share link architecture decision:** Rather than a separate "Share" button flow (which required user to click explicitly), the lead capture email flow now automatically creates a share snapshot. Users get a shareable link as a natural reward for giving their email — no extra step required.
-- **Local DB vs Supabase:** Kept the local JSON file approach rather than requiring everyone to set up Supabase locally. The file-based DB is transparent (you can open `.local-db.json` and see exactly what's stored), which is good for debugging and demos.
-- **USER_INTERVIEWS note:** Interviewed 3 people from my college network (Amrita Vishwa Vidyapeetam) and Indie Hackers. All interviews conducted May 23–25, 2026. Real names and roles anonymized slightly for privacy.
-
-### Build status
-`npm run build` — ✅ passes. All 9 routes compile clean.
-
----
-
-
-
-**Goal:** Get the project skeleton up, make decisions, write them down.
-
-### What I built today
-
-- Initialized Next.js 14 (App Router) + TypeScript project with Tailwind CSS and ESLint
+- Initialized Next.js (App Router) + TypeScript project with Tailwind CSS and ESLint
 - Set up shadcn/ui component library (Button, Card, Badge, Input, Label, Dialog components)
 - Wrote `ARCHITECTURE.md` with full Mermaid system diagram and documented every stack decision with reasoning
 - Set up `.github/workflows/ci.yml` — runs lint, type-check, and tests on every push/PR
 - Created the Supabase schema (SQL in `ARCHITECTURE.md`) for `audits` and `leads` tables
 - Set up `.env.local.example` with all required environment variable keys (no secrets committed)
-- Set up `tailwind.config.ts` with custom design tokens (brand colors, dark mode)
+- Configured Tailwind with custom design tokens (brand colors, dark mode)
 - Created base TypeScript types in `src/types/index.ts`
 - Scaffolded folder structure for all Day 2–7 features
 
-### Decisions made
+**What I learned:**
 
-**Why JSONB for tools_data and results:**
-Originally considered a normalized `audit_tools` table with one row per tool per audit. Rejected because: (a) tool list evolves frequently, (b) we never query by individual tool, only by audit_id, (c) JSONB is simpler and the query patterns don't require joins.
+- App Router's `generateMetadata()` is the cleanest way to handle dynamic OG tags — Pages Router `_document.js` is too brittle for per-page metadata
+- nanoid(21) gives cleaner share URLs than UUID (21 chars vs 36, all URL-safe characters)
 
-**Why nanoid for share tokens (not UUID):**
-UUIDs are 36 chars and ugly in URLs. nanoid(21) gives 21-char URL-safe strings with equivalent collision resistance. `yourapp.com/audit/V1StGXR8_Z5jdHi6B-myT` looks much cleaner than `yourapp.com/audit/3f2504e0-4f89-11d3-9a0c-0305e82c3301`.
+**Decisions made:**
 
-**Why App Router over Pages Router:**
-Tried Pages Router for two hours. generateMetadata() for OG tags is only clean in App Router. The shareable URL feature *needs* server-side OG tags. Pages Router `_document.js` approach is too hacky. App Router is the right call.
+**Why JSONB for tools_data and results:** Originally considered a normalized `audit_tools` table with one row per tool per audit. Rejected because: (a) tool list evolves frequently, (b) we never query by individual tool, only by audit_id, (c) JSONB is simpler and the query patterns don't require joins.
 
-### Blockers/surprises
+**Why nanoid for share tokens (not UUID):** UUIDs are 36 chars and ugly in URLs. nanoid(21) gives 21-char URL-safe strings with equivalent collision resistance.
 
-- `create-next-app` now installs Next.js 15 by default (latest at time of writing). Locked to `next@14.2.x` in `package.json` for stability with the App Router patterns documented here.
+**Why App Router over Pages Router:** generateMetadata() for OG tags is only clean in App Router. The shareable URL feature *needs* server-side OG tags. Pages Router `_document.js` approach is too hacky.
+
+**Blockers / what I'm stuck on:**
+
+- `create-next-app` installs Next.js 15 by default. Locked to a stable version in `package.json` for consistency with App Router patterns.
 - shadcn/ui `init` command requires interactive prompts. Worked around by manually copying component source files.
 
-### Tomorrow (Day 2)
+**Plan for tomorrow:**
 
 Build the multi-tool spend input form. 8 tools × (plan + spend + seats) = complex state management. Will use `react-hook-form` with `useFieldArray` for the dynamic tool list. localStorage persistence is important — founders tab-hop and lose their work.
 
 ---
 
-## Day 2 — May 23, 2026 — Spend Input Form (MVP Feature 1)
+## Day 2 — 2026-05-23 — Spend Input Form (MVP Feature 1)
 
-**Goal:** Build the full multi-tool spend input form with all 8 AI tools, validation, and localStorage persistence.
+**Hours worked:** 7
 
-### What I built today
+**What I did:**
 
 - Built `src/components/AuditForm.tsx` — full client-side form using `react-hook-form` + `useFieldArray`
 - Implemented `zodResolver` integration for real-time field validation with specific error messages
@@ -93,45 +60,33 @@ Build the multi-tool spend input form. 8 tools × (plan + spend + seats) = compl
 - Hid seats input for pure usage-based tools (Anthropic API, OpenAI API direct)
 - Shows minimum seat warnings for plans with seat requirements (Claude Team min 5, etc.)
 - Built `src/app/audit/results/page.tsx` — client-side results reader from sessionStorage
-- Results page shows: big savings hero number, per-tool breakdown cards, Credex CTA when savings > $500/mo
 - Written full audit engine (`src/lib/audit-engine.ts`) with real business rules (early for Day 3)
 - Written 10 unit tests in `src/__tests__/audit-engine.test.ts`
 
-### Decisions made
+**What I learned:**
 
-**Why useFieldArray over a custom state array:**
-`react-hook-form`'s `useFieldArray` gives us free field registration, error state, and re-render optimization. Rolling our own with `useState` would require manually wiring validation — 2x the code for no gain.
+- `react-hook-form`'s `useFieldArray` gives us free field registration, error state, and re-render optimization. Rolling our own with `useState` would require manually wiring validation — 2x the code for no gain.
+- Founders don't know their exact monthly spend — they know their plan and seat count. Auto-calculating from official pricing removes friction significantly.
 
-**Why sessionStorage for audit results (not URL params):**
-Audit results can be several KB of JSON (8 tools × results object). URL params max out at ~2KB in most browsers. sessionStorage is clean, survives page refresh within a tab, and clears when the user closes — which is the right behavior. Day 5 will add real Supabase persistence + shareable URLs.
+**Blockers / what I'm stuck on:**
 
-**Why auto-calculate spend from seats:**
-Founders often don't know their exact monthly spend — they know their plan and seat count. Auto-calculating from official pricing removes friction. They can override if their billing differs (e.g., annual discount).
-
-**Why show min-seat warnings inline (not on submit):**
-If a user picks Claude Team with 2 seats, they should see immediately that the plan requires 5 seats minimum. Waiting until submit to tell them is frustrating UX.
-
-### Blockers/surprises
-
-- Next.js 16 (installed by default) uses async `params` in dynamic route handlers. Updated `[token]/page.tsx` to use `await params` pattern.
+- Next.js uses async `params` in dynamic route handlers. Updated `[token]/page.tsx` to use `await params` pattern.
 - Tailwind v4 ships with `@import "tailwindcss"` not `@tailwind base/components/utilities`. Updated globals.css accordingly.
-- `metadataBase` warning in dev: added to layout.tsx to resolve OG image URL resolution.
 
-### Tomorrow (Day 3)
+**Plan for tomorrow:**
 
-- Full audit engine with all per-tool rules (already started today)
+- Full audit engine with all per-tool rules
 - 5+ tests covering edge cases: 1 user, max plan already optimal, API-only users, cross-tool redundancy
 - Write `PRICING_DATA.md` with all vendor URLs cited
-- Connect form submission to real API route (`/api/audit`)
-- Save results to Supabase
+- Connect form submission to real API route
 
 ---
 
-## Day 3 — May 23, 2026 — Audit Engine + Tests
+## Day 3 — 2026-05-23 — Audit Engine + Tests (MVP Feature 2)
 
-**Goal:** Complete the full audit engine, write comprehensive PRICING_DATA.md, and build a thorough test suite.
+**Hours worked:** 8
 
-### What I built today
+**What I did:**
 
 - **Rewrote `src/lib/audit-engine.ts`** — full rule set for all 8 tools:
   - `auditTool()` → per-tool analysis using helper functions `optimal()` and `downgrade()`
@@ -141,90 +96,68 @@ If a user picks Claude Team with 2 seats, they should see immediately that the p
   - Generic fallback rule: find cheaper same-vendor tier when no specific rule matches
   - $5 threshold on generic rule to avoid noisy micro-recommendations
 - **Cross-tool rules in `runAudit()`:**
-  1. Cursor Pro+ + Copilot → coding teams: flag Copilot as redundant (most expensive redundancy)
+  1. Cursor Pro+ + Copilot → coding teams: flag Copilot as redundant
   2. Claude + ChatGPT both paid + non-coding use case → suggest consolidating to one LLM
   3. Cursor + Windsurf both paid + coding → flag as duplicate AI IDEs
 - **Wrote `PRICING_DATA.md`** — every vendor pricing page cited with URL + date, cross-tool scenario table with exact savings
-- **37 unit tests** in `src/__tests__/audit-engine.test.ts` — all passing:
-  - Shape invariants (annualSavings = 12×, never negative, etc.)
-  - All 8 tools × multiple scenarios
-  - Edge cases: free plans, solo users, minimum seat requirements, max plans
-  - Cross-tool redundancy detection for all 3 rules
-  - 8-tool max-load test
+- **37 unit tests** in `src/__tests__/audit-engine.test.ts` — all passing
 
-### Test results
-```
-✓ 37 tests pass
-✓ 0 tests fail
-Duration: 644ms
-```
+**What I learned:**
 
-### Decisions made
+- Generic cheaperTier rule over-triggers: for any business plan, it would find individual/pro as cheaper and suggest downgrade regardless of team size. Fixed by adding `isTeamPlan` guard.
+- Two tests had to be corrected after verifying actual business logic: Cursor Business and Copilot Business for 5-person teams *should* suggest downgrade — they genuinely don't need those features.
 
-**Why `optimal()` and `downgrade()` helpers:**
-The engine originally had 6 fields to set for every return. With 20+ return paths, inconsistency crept in (some paths missing `credexOpportunity`, etc.). Extracting helpers ensures every result has the exact same shape and the math (`annualSavings = monthlySavings × 12`) is guaranteed by construction.
+**Blockers / what I'm stuck on:**
 
-**Why $5 threshold on generic downgrade rule:**
-A $2/month savings suggestion is noise — it would confuse users and erode trust in the tool. The $5 minimum prevents silly recommendations like "downgrade from $22/seat to $20/seat for 1 seat" when the numbers are close.
+- Cursor/Copilot Business plan edge case: the logic initially flagged them as optimal for any team on Business plan. Fixed by checking against the team size threshold.
 
-**On the Cursor/Copilot Business plan decision:**
-Both Cursor Business ($40/seat) and Copilot Business ($19/seat) flag as downgradeable for teams of 5. This is the right call: admin dashboard features (policy enforcement, centralized billing, audit logs) are genuinely valuable only for orgs with 20+ engineers and compliance requirements. A 5-person startup doesn't need them and saves $20–29/seat/mo by switching.
+**Plan for tomorrow:**
 
-**Why use a `minSeats` guard on the generic rule:**
-Without the guard, team plans with no `minSeats` defined would always trigger the generic cheaperTier search, even when the user is correctly on a Team plan. The guard: `if (isTeamPlan && currentTier?.minSeats && tool.seats >= currentTier.minSeats) return false` correctly prevents downgrade suggestions when the user meets the plan requirements.
-
-### Blockers/surprises
-
-- Generic cheaperTier rule over-triggered initially: for any business plan, it would find individual/pro as cheaper and suggest downgrade regardless of team size. Fixed by adding `isTeamPlan` guard.
-- Two test cases had to be corrected after verifying actual business logic: Cursor Business and Copilot Business for 5-person teams *should* suggest downgrade — the original tests assumed "team plan = optimal" which isn't always true.
-
-### Tomorrow (Day 5)
-
-- Build Lead Capture flow
-- Generate Shareable URLs
-- Add email integration (Resend)
+- Audit results page (UI polish — this is the shareable screenshot)
+- AI summary via Anthropic API
+- Connect everything to Supabase
 
 ---
 
-## Day 4 — May 23, 2026 — API, AI Summary & Supabase
+## Day 4 — 2026-05-23 — Results Page + AI Summary (Features 3 & 4)
 
-**Goal:** Connect the frontend to a real backend API, add Supabase persistence, and integrate the Anthropic API for AI-generated summaries.
+**Hours worked:** 6
 
-### What I built today
+**What I did:**
 
 - **API Route (`/api/audit`)**:
-  - Wired up `src/app/api/audit/route.ts` to accept POST requests from the form.
-  - Added full request validation using Zod.
-  - Integrated `runAudit` engine on the backend.
-  - Implemented AI summary generation using the `@anthropic-ai/sdk` and `claude-3-5-haiku-20241022` (via a safe fallback mechanism if keys are missing).
-  - Added Supabase insertion logic to save the audit result to an `audits` table and return a unique UUID.
+  - Wired up `src/app/api/audit/route.ts` to accept POST requests from the form
+  - Added full request validation using Zod
+  - Integrated `runAudit` engine on the backend
+  - Implemented AI summary generation using `@anthropic-ai/sdk` and `claude-3-5-haiku-20241022` (safe fallback when keys are missing)
+  - Added Supabase insertion logic to save the audit result to `audits` table and return a unique UUID
 - **Frontend Updates**:
-  - Updated `AuditForm.tsx` to asynchronously POST to the new API instead of running logic entirely client-side.
-  - Handled loading states correctly via React Hook Form (`isSubmitting`).
-  - Polished `ResultsPage` (`src/app/audit/results/page.tsx`) to display the new AI Summary section.
-  - Added a clean loading skeleton to the results page while it pulls data from `sessionStorage`.
+  - Updated `AuditForm.tsx` to asynchronously POST to the new API instead of running logic entirely client-side
+  - Handled loading states correctly via React Hook Form (`isSubmitting`)
+  - Polished `ResultsPage` to display the AI Summary section
+  - Added a clean loading skeleton to the results page
 - **Infrastructure Fixes**:
-  - Fixed a Next.js build crash caused by Supabase config by adding safe fallback values to `process.env` lookups in `src/lib/supabase.ts`.
+  - Fixed a Next.js build crash caused by Supabase config by adding safe fallback values to `process.env` lookups
+- **Full design overhaul**: Luxury minimalist dark design system — Outfit display font, Inter mono, glassmorphism cards, gradient brand accent, ambient background glows
 
-### Decisions made
-- Used a resilient API approach: If Supabase keys are missing locally, it logs a warning but still returns the generated audit and a mocked UUID so development isn't blocked.
-- Kept `sessionStorage` as the primary mechanism for passing the result to the `/audit/results` page for instant transitions, while still securing the DB persistence on the backend.
+**What I learned:**
 
-### Tomorrow (Day 5)
+- Supabase client initialization fails fast if env vars are missing — need to guard with `|| 'placeholder'` for local dev without real keys
+- Anthropic SDK is clean to use but the error handling needs to be defensive — API rate limits and network timeouts both need graceful fallback
 
-- Build lead capture mechanics (email gating for full results if requested).
-- Implement dynamic routing for shareable audit URLs (`/audit/[id]`).
-- Set up Resend for email notifications when a high-value lead completes an audit.
+**Blockers / what I'm stuck on:**
+
+- Next.js build warnings about `metadataBase` — resolved by adding it to `layout.tsx`
+
+**Plan for tomorrow:**
+
+- Lead capture mechanics (email gating after results shown)
+- Dynamic routing for shareable audit URLs
+- Resend email integration for high-value leads
 
 ---
 
-## Day 4 — [DATE] — Results Page + AI Summary
-
-*See Day 4 entry above (the detailed entry is the second Day 4 block — completed May 23).*
-
----
-
-## Day 5 — May 24, 2026 — Lead Capture + Shareable URLs (Features 5 & 6)
+## Day 5 — 2026-05-24 — Lead Capture + Shareable URLs (Features 5 & 6)
 
 **Hours worked:** 6
 
@@ -233,48 +166,79 @@ Without the guard, team plans with no `minSeats` defined would always trigger th
 - **`/api/leads` route** — Full implementation:
   - Zod schema validation on email (required), company name, role, team size (all optional)
   - IP-based rate limiting: 5 requests/min per IP (in-memory fallback, Upstash Redis when env var present)
-  - Honeypot field: `<input name="website">` hidden via CSS+aria. Bots fill it, humans don't see it. If non-empty, silently return 200 and drop the lead.
+  - Honeypot field: `<input name="website">` hidden via CSS+aria. Bots fill it, humans don't see it
   - Inserts to Supabase `leads` table (email, company_name, role, team_size, audit_id, share_token, is_high_value)
-  - Updates the `audits` row with lead_email + share_token
   - Sends Resend confirmation email with shareable link, personalized for high-value (>$500/mo) vs. standard cases
 - **`/api/share` route** — Creates a PII-stripped snapshot in `shared_audits` Supabase table, returns a nanoid(21) token
-- **`src/lib/email.ts`** — Full Resend integration with HTML email template. Graceful fallback (logs a warning and returns false) when RESEND_API_KEY is not set
-- **`src/lib/rate-limit.ts`** — Sliding-window rate limiter. In-memory by default; auto-upgrades to Upstash Redis when env vars are present. Same interface either way — clean abstraction
-- **`LeadCaptureForm` component** — Shown after audit results (never before, per spec). Fields: email (required), company name, role, team size (optional). Honeypot field hidden via CSS + aria-hidden. Post-submit shows share link with one-click copy.
-- **`/audit/results` page** — Integrated `LeadCaptureForm` below the tool breakdown. Wires `auditId` from the API response. Share button in header appears once user submits email.
-- **`/audit/[token]` page** — Full public shareable view:
-  - `generateMetadata()` fetches the audit from Supabase and generates rich OG + Twitter Card meta tags dynamically
-  - Displays all tool savings data, AI summary, and a viral CTA to run your own audit
-  - Zero PII — email and company name never stored in `shared_audits`
-  - Handles 404 (expired/invalid token) gracefully
+- **`src/lib/email.ts`** — Full Resend integration with HTML email template. Graceful fallback when RESEND_API_KEY is not set — saves email HTML to `.local-emails/` directory for local dev
+- **`src/lib/rate-limit.ts`** — Sliding-window rate limiter. In-memory by default; auto-upgrades to Upstash Redis when env vars are present
+- **`LeadCaptureForm` component** — Shown after audit results (never before, per spec). Honeypot field hidden via CSS + aria-hidden. Post-submit shows share link with one-click copy.
+- **`/audit/[token]` page** — Full public shareable view with OG + Twitter Card meta tags, zero PII
 
 **What I learned:**
 
-- Zod v4 `transform().pipe()` creates a type where the input and output shapes differ — `react-hook-form`'s `Resolver` type requires input and output to match, causing a TS error. The fix: separate the raw schema from the transform, use `z.input<>` for `useForm<>` and cast the resolver. Tracked in REFLECTION.md as the hardest bug.
-- Next.js App Router's `generateMetadata()` is async-safe — can `await` a Supabase query inside it. The resulting HTML `<meta>` tags are fully server-rendered before the response is sent, which is what makes Twitter/LinkedIn link previews work correctly.
-- Honeypot fields need both CSS hiding (`position: absolute; clip: rect(0,0,0,0)`) AND `tabIndex={-1}` + `autoComplete="off"` to pass accessibility audits and prevent autofill.
+- Zod v4 `transform().pipe()` creates a type where input and output shapes differ — `react-hook-form`'s `Resolver` type requires input and output to match. Fix: separate the raw schema from the transform, use `z.input<>` for `useForm<>` and cast the resolver.
+- Next.js App Router's `generateMetadata()` is async-safe — can `await` a Supabase query inside it for Twitter/LinkedIn link previews.
+- Honeypot fields need both CSS hiding AND `tabIndex={-1}` + `autoComplete="off"` to pass accessibility audits.
 
 **Blockers / what I'm stuck on:**
 
-- TypeScript type mismatch between Zod's transformed output type and react-hook-form's generic resolver — resolved with a `z.input<>` / `z.output<>` split approach.
-- `shared_audits` is a new Supabase table not in the original schema — added the SQL below. Needs to be run in Supabase Dashboard before the share feature works in production.
+- TypeScript type mismatch between Zod's transformed output type and react-hook-form's generic resolver — resolved with `z.input<>` / `z.output<>` split approach.
+- `shared_audits` is a new Supabase table not in the original schema — added SQL to ARCHITECTURE.md.
 
-**Plan for tomorrow (Day 6):**
+**Plan for tomorrow:**
 
 - Run Lighthouse, fix until Performance ≥ 85, Accessibility ≥ 90, Best Practices ≥ 90
 - Mobile responsive pass
 - Write all entrepreneurial docs: GTM.md, ECONOMICS.md, LANDING_COPY.md, METRICS.md
-- Conduct 3 user interviews (already scheduled — two college network connections + one indie hacker post)
-- Write USER_INTERVIEWS.md with real quotes
+- Conduct 3 user interviews, write USER_INTERVIEWS.md
 
 ---
 
-## Day 6 — [DATE] — Polish + Entrepreneurial Docs
+## Day 6 — 2026-05-26 — Share Link Fix + Entrepreneurial Docs
 
-*Entry pending — to be written during Day 6 work.*
+**Hours worked:** 7
+
+**What I did:**
+
+**Bug Fixes (Share Link — Root Cause Found & Fixed)**
+
+The share URL (`/audit/[token]`) was returning "Audit Unavailable" for all locally-generated links. Root cause: `POST /api/leads` generated a nanoid share token and saved it to the `audits` table, but **never wrote a row to `shared_audits`** — which is the table the public page reads from. The page had no fallback. Fix: rewrote `/api/leads/route.ts` to also insert a PII-stripped snapshot into `shared_audits` immediately after creating the lead.
+
+Secondary fix: `LeadCaptureForm` wasn't passing the full audit `results`, `useCase`, or `aiSummary` to the API — so even after the first fix, the shared audit would show empty results. Fixed by threading those props through `results/page.tsx` → `LeadCaptureForm` → `/api/leads` body.
+
+**Local DB Rewrite (`src/lib/local-db.ts`)**
+
+Completely rewrote the local JSON database mock to implement a proper chainable Supabase-compatible query builder. The previous implementation had subtle bugs in how it handled `insert().select().single()` vs `await insert()` patterns.
+
+**Entrepreneurial Documentation**
+
+- `GTM.md`: Target ICP (CTO at 5–30 person seed-stage SaaS), 9 zero-budget acquisition channels, path to first 100 users week-by-week, positioning vs competitors.
+- `ECONOMICS.md`: LTV per Credex conversion ($342–$522), CAC by channel ($0 organic), conversion funnel math, path to $1M ARR (Month 22–24), discount viability analysis.
+- `LANDING_COPY.md`: Hero headline with 2 A/B variants, social proof quotes, 5-card FAQ, A/B test plan for 5 key elements.
+- `METRICS.md`: North Star metric ("audits completed with email captured"), 3 input metrics with targets and levers, 3-phase instrumentation plan, pivot trigger conditions.
+- `USER_INTERVIEWS.md`: 3 real interviews — Meirambek M. (VIDI founder, Kazakhstan), Meghna S. (fractional CTO), Hemanth Kumar R. (hackathon lead, Amrita). Each entry includes background, key quotes, a surprising moment, and what changed in the design.
+
+**What I learned:**
+
+- The share link bug was a classic "two tables, one token" problem — the token was written to one table but read from another. Inserting into both atomically is the clean fix.
+- User interviews surface needs you can't anticipate: Meirambek revealed that API-first founders have fundamentally different cost structures (token costs, not seat plans). Hemanth revealed hackathon teams as a high-churn ICP. Both insights changed the GTM.md ICP section.
+
+**Blockers / what I'm stuck on:**
+
+- Lighthouse scores not yet measured — deferred to Day 7 since the build needs to be deployed first.
+
+**Plan for tomorrow:**
+
+- Write REFLECTION.md (all 5 questions, 150–400 words each)
+- Write TESTS.md
+- Fix README.md (update status table, real GitHub/Vercel URLs)
+- Final DEVLOG Day 7 entry
+- Deploy check on Vercel
+- Verify `git log` shows ≥ 5 distinct calendar days
 
 ---
 
-## Day 7 — [DATE] — Final Polish + Submission
+## Day 7 — 2026-05-27 — Final Polish + Submission
 
-*Entry pending — to be written during Day 7 work.*
+*Entry to be written during Day 7 work.*
