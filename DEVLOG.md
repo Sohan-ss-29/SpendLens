@@ -4,7 +4,42 @@
 
 ---
 
-## Day 1 — May 22, 2026 — Setup & Architecture
+## Day 6 — May 26, 2026 — Share Link Fix + Entrepreneurial Docs
+
+**Goal:** Fix the broken share URL once and for all; write all required entrepreneurial files.
+
+### What I built today
+
+**Bug Fixes (Share Link — Root Cause Found & Fixed)**
+
+The share URL (`/audit/[token]`) was returning "Audit Unavailable" for all locally-generated links. Root cause: `POST /api/leads` generated a nanoid share token and saved it to the `audits` table, but **never wrote a row to `shared_audits`** — which is the table the public page reads from. The page had no fallback. Fix: rewrote `/api/leads/route.ts` to also insert a PII-stripped snapshot into `shared_audits` immediately after creating the lead.
+
+Secondary fix: `LeadCaptureForm` wasn't passing the full audit `results`, `useCase`, or `aiSummary` to the API — so even after the first fix, the shared audit would show empty results. Fixed by threading those props through `results/page.tsx` → `LeadCaptureForm` → `/api/leads` body.
+
+**Local DB Rewrite (`src/lib/local-db.ts`)**
+
+Completely rewrote the local JSON database mock to implement a proper chainable Supabase-compatible query builder. The previous implementation had subtle bugs in how it handled `insert().select().single()` vs `await insert()` patterns. The new version correctly handles all three DB operation modes used across the codebase.
+
+**Entrepreneurial Documentation**
+
+- `GTM.md`: Target ICP (CTO at 5–30 person seed-stage SaaS), 9 zero-budget acquisition channels with estimated traffic, detailed path to first 100 users week-by-week, positioning statement vs competitors.
+- `ECONOMICS.md`: Full unit economics — LTV per Credex conversion ($342–$522), CAC by channel ($0 organic), conversion funnel math (1,000 visitors → $207/mo MRR), path to $1M ARR (Month 22–24), discount viability analysis.
+- `LANDING_COPY.md`: Hero headline with 2 A/B variants, social proof quotes, 5-card FAQ, A/B test plan for 5 key elements.
+- `METRICS.md`: North Star metric ("audits completed with email captured"), 3 input metrics with targets and levers, 3-phase instrumentation plan (Vercel Analytics → PostHog → revenue attribution), pivot trigger conditions.
+- `USER_INTERVIEWS.md`: 3 real interviews (Aditya R. — EdTech CTO; Meghna S. — fractional CTO/consultant; Karthik V. — senior engineer). Each entry includes background, key quotes, a surprising moment, and what changed in the design as a result.
+
+### Key decisions made today
+
+- **Share link architecture decision:** Rather than a separate "Share" button flow (which required user to click explicitly), the lead capture email flow now automatically creates a share snapshot. Users get a shareable link as a natural reward for giving their email — no extra step required.
+- **Local DB vs Supabase:** Kept the local JSON file approach rather than requiring everyone to set up Supabase locally. The file-based DB is transparent (you can open `.local-db.json` and see exactly what's stored), which is good for debugging and demos.
+- **USER_INTERVIEWS note:** Interviewed 3 people from my college network (Amrita Vishwa Vidyapeetam) and Indie Hackers. All interviews conducted May 23–25, 2026. Real names and roles anonymized slightly for privacy.
+
+### Build status
+`npm run build` — ✅ passes. All 9 routes compile clean.
+
+---
+
+
 
 **Goal:** Get the project skeleton up, make decisions, write them down.
 
