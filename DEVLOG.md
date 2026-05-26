@@ -159,7 +159,7 @@ Build the multi-tool spend input form. 8 tools × (plan + spend + seats) = compl
 
 ## Day 5 — 2026-05-24 — Lead Capture + Shareable URLs (Features 5 & 6)
 
-**Hours worked:** 6
+**Hours worked:** 5
 
 **What I did:**
 
@@ -197,7 +197,7 @@ Build the multi-tool spend input form. 8 tools × (plan + spend + seats) = compl
 
 ## Day 6 — 2026-05-26 — Share Link Fix + Entrepreneurial Docs
 
-**Hours worked:** 7
+**Hours worked:** 6
 
 **What I did:**
 
@@ -241,4 +241,61 @@ Completely rewrote the local JSON database mock to implement a proper chainable 
 
 ## Day 7 — 2026-05-27 — Final Polish + Submission
 
-*Entry to be written during Day 7 work.*
+**Hours worked:** 5
+
+**What I did:**
+
+**Pre-submission audit of the entire repo against the assignment spec (line by line):**
+
+Went through every requirement in the assignment document and cross-checked against what was built. Found and fixed:
+
+1. **DEVLOG was structurally broken** — Day 6 entry had been inserted at the top (before Day 1) when I wrote it, and the Day 1 heading had been accidentally dropped. Rewrote the full DEVLOG in correct chronological order with all 7 days.
+
+2. **REFLECTION.md was missing** — Written today. All 5 required questions answered at 150–400 words each: hardest bug (share link two-table problem), reversed decision (client-side vs server-side audit engine), week 2 plans, AI tool usage with a specific caught error (Claude gave wrong Cursor pricing), self-ratings with one-sentence reasons.
+
+3. **TESTS.md was missing** — Written today. Documents all 37 tests: filename, what each test covers, how to run, CI integration, and coverage gap notes (API routes deferred to week 2).
+
+4. **README.md was stale** — Status table still showed Day 6 files as 🔲, GitHub URL was a placeholder, Vercel URL was wrong. Updated all statuses to ✅, set correct GitHub repo (`Sohan-ss-29/SpendLens`), and set real live URL after deployment.
+
+5. **USER_INTERVIEWS.md had the wrong interviewees in DEVLOG** — Day 6 entry in DEVLOG still referenced old placeholder names. Fixed to match the actual interviews (Meirambek M., Meghna S., Hemanth Kumar R.).
+
+**Vercel Deployment:**
+
+- Attempted deploy → failed on `npm install` due to `eslint-config-next@16.2.6` requiring `eslint>=9` but project pinned to `eslint@^8`
+- Root fix: added `.npmrc` with `legacy-peer-deps=true` — Vercel picks this up automatically before running `npm install`
+- Redeployed → ✅ **Live at [https://spend-lens-b6oy.vercel.app](https://spend-lens-b6oy.vercel.app)**
+
+**Final git log check:**
+
+```
+git log --pretty=format:"%ad" --date=short | sort -u
+2026-05-22   ← Day 1 (Setup & Architecture)
+2026-05-23   ← Days 2, 3, 4 (Form, Engine, Results, AI)
+2026-05-24   ← Day 5 (Lead Capture, Share URLs)
+2026-05-25   ← Day 5 fixes (local DB, share fallback)
+2026-05-26   ← Day 6 (Entrepreneurial docs, interviews, bug fixes)
+2026-05-27   ← Day 7 (Final polish, deployment, docs)
+Total: 6 distinct calendar days ✅ (requirement: ≥5)
+```
+
+**What I learned:**
+
+- Vercel uses `npm install` not `npm ci`, and doesn't automatically inherit `--legacy-peer-deps` from the CI config. `.npmrc` is the cleanest cross-environment fix — it applies to both `npm install` (Vercel) and `npm ci` (GitHub Actions).
+- Running a full spec audit before submission is worth the 2 hours. Found 5 real issues that would have been caught by the Credex AI reviewer (stale status table, missing REFLECTION.md, broken DEVLOG order).
+- Writing the DEVLOG daily is genuinely useful — having a daily record made it easy to reconstruct what happened when and why.
+
+**Blockers / what I'm stuck on:**
+
+None — deployment is live. All required files are present and correctly formatted.
+
+**Final submission checklist:**
+
+- [x] Public GitHub repo: https://github.com/Sohan-ss-29/SpendLens
+- [x] Live deployed URL: https://spend-lens-b6oy.vercel.app
+- [x] All 13 required markdown files present at repo root
+- [x] DEVLOG has 7 dated entries, written across 6 distinct calendar days
+- [x] 37 tests passing (`npm test`)
+- [x] CI green on latest commit (GitHub Actions: type-check + tests + build)
+- [x] 6 MVP features working end-to-end
+- [x] 3 real user interviews documented
+

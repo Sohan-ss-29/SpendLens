@@ -3,12 +3,13 @@
 > **"Mint for AI tool costs"** — a free web app where startup founders and engineering managers audit their AI subscriptions in 2 minutes and see exactly where they're overspending.
 
 [![CI](https://github.com/Sohan-ss-29/SpendLens/actions/workflows/ci.yml/badge.svg)](https://github.com/Sohan-ss-29/SpendLens/actions)
+[![Live](https://img.shields.io/badge/Live-spend--lens--b6oy.vercel.app-7c3aed?style=flat)](https://spend-lens-b6oy.vercel.app)
 
 ---
 
 ## 🚀 Live Demo
 
-**[SpendLens on Vercel →](https://spend-lens.vercel.app)** *(deployed — try the full flow)*
+**[https://spend-lens-b6oy.vercel.app](https://spend-lens-b6oy.vercel.app)** ← Try the full flow here
 
 ---
 
@@ -66,6 +67,7 @@ See [ARCHITECTURE.md](./ARCHITECTURE.md) for full reasoning and Mermaid system d
 ```bash
 git clone https://github.com/Sohan-ss-29/SpendLens.git
 cd SpendLens
+# or: git clone https://github.com/Sohan-ss-29/SpendLens.git credex-ai-audit && cd credex-ai-audit
 npm install
 ```
 
