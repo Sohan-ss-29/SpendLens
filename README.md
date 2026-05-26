@@ -27,7 +27,14 @@ No login. No account. No credit card. 2 minutes.
 
 ## Screenshots
 
-> *Run the audit at the live URL and screenshot your results — the savings hero number is the shareable moment.*
+<img width="1899" height="928" alt="image" src="https://github.com/user-attachments/assets/ac69a03d-13f8-477b-91f5-59ca05c14c86" />
+<img width="1910" height="930" alt="image" src="https://github.com/user-attachments/assets/c4a31aea-62da-42fb-9422-c80a311d8d97" />
+<img width="1907" height="935" alt="image" src="https://github.com/user-attachments/assets/ed14d43e-43f3-40ed-a887-941446fabb0c" />
+<img width="1905" height="933" alt="image" src="https://github.com/user-attachments/assets/3f006731-c3a1-4851-9e51-e409df17cd31" />
+
+
+
+
 
 **Audit Input Form** — Tool picker grid with 8 AI tools, auto-calculates spend from plan × seats, localStorage persistence across reloads.
 
