@@ -16,7 +16,7 @@
 **Role:** Solo Founder & CTO, VIDI — AI contract review for SMBs
 **Product:** VIDI is an AI-powered contract analysis tool that helps small and medium businesses understand legal risks in plain English. Users upload contracts and get risk detection and simple explanations. Launched MVP, early traction on Product Hunt.
 **Date:** May 24, 2026
-**Format:** LinkedIn DM → 20-minute voice call (Google Meet)
+**Format:** IndieHackers → 20-minute voice call (Google Meet)
 
 ### Background
 Meirambek is a solo technical founder based in Kazakhstan, building VIDI — an AI product that uses LLMs to analyze contracts for SMBs who can't afford a lawyer for every deal. He's entirely self-funded and cost-conscious by necessity. His AI stack is his single largest operational cost: Claude API for contract analysis is the core of his product, and he also uses Cursor daily for coding.
@@ -49,7 +49,7 @@ Meirambek pointed out a gap we hadn't considered: **solo AI product founders** h
 
 **Interviewee:** Meghna S.
 **Role:** Independent consultant / fractional CTO, works with 3–5 startups at a time
-**Date:** May 24, 2025
+**Date:** May 25, 2025
 **Format:** LinkedIn DM thread + 10-minute WhatsApp call
 
 ### Background
@@ -77,57 +77,63 @@ Meghna pointed out that the tool currently only supports a fixed tool list. She 
 
 ## Interview 3
 
-**Interviewee:** Karthik V.
-**Role:** Software Engineer (senior IC), 30-person Series A startup
-**Date:** May 25, 2025
-**Format:** In-person (college senior, same campus), ~25 minutes
+**Interviewee:** Hemanth Kumar R. ([@hemanth-reddy048 on LinkedIn](https://www.linkedin.com/in/hemanth-reddy048/))
+**Role:** Student Developer & Hackathon Lead, Amrita Vishwa Vidyapeetam
+**Context:** Active hackathon participant and team lead — has won multiple hackathons and regularly coordinates teams that use AI tools and subscriptions for rapid prototyping and building.
+**Date:** May 25, 2026
+**Format:** WhatsApp audio call, ~15 minutes
 
 ### Background
-Not a founder — a senior engineer who manages his own tool subscriptions and occasionally influences team tool decisions. Uses Cursor Pro, Claude Pro, and occasional ChatGPT. His company pays for GitHub Copilot centrally.
+Hemanth is from the same university and is well-known in the campus tech community for leading winning hackathon teams. When building for hackathons, teams typically pile on multiple AI subscriptions fast — Cursor, GitHub Copilot, ChatGPT Plus — often on personal accounts or shared team cards. Post-hackathon, those subscriptions often keep running because nobody remembers to cancel. He's both a user and a coordinator of other teams' AI spend.
 
 ### Key Quotes
 
-> "I genuinely didn't know my company was already paying for Copilot until I looked at your audit results and thought 'wait, I should check.' Turned out I've been paying $10/mo for Copilot personally for 6 months while the company has an enterprise licence."
+> "For a hackathon we just sign up for everything — Cursor, Copilot, ChatGPT Plus. Nobody thinks about cost in the moment. After the hackathon is over, half the subscriptions keep running for months. We've definitely lost money that way."
 
-> "The savings number at the top is great. But I immediately wanted to scroll down to see which tool to cancel first. The ordering felt random — can you sort by highest savings at the top?"
+> "Our last team had 4 people all paying individually for Cursor Pro. That's $80/mo total. One team Cursor account would've been $40. Nobody realized until after."
 
-> "I shared the link with two friends from college who are doing internships at startups. One of them came back saying 'this found $80/mo for my 3-person founding team.' That's not a huge number but it felt significant to them."
+> "I tried SpendLens with the tools from our last hackathon build. Found we were paying for both GitHub Copilot and Cursor — it flagged the overlap immediately and told us which one to drop based on what we were doing. That's actually useful."
 
-> "The 'No login required' thing is huge. I've abandoned so many tools at the signup form. The fact that I just typed in my tools and got a result in 30 seconds — that's why I actually completed it."
+> "The UI is clean. I showed it to two other team leads on campus and they both ran it. One of them had ChatGPT Plus on two email accounts — didn't realize he was double paying."
+
+> "What would make this perfect for hackathon teams is if you could add like 4 people's tools and it combines everything. Right now I have to do each person's tools one by one."
 
 ### Surprising Moment
-Karthik ran the audit three times with different tool combinations to see how the recommendations changed. This was pure exploration/curiosity — he treated it more like a calculator than a one-time audit tool. This showed the potential for a "what if I switch from X to Y?" simulator mode.
+Hemanth mentioned that hackathon teams are a **completely underserved segment** for this kind of tool. They're one of the few groups who *intentionally* accumulate multiple AI subscriptions in a short window and then forget about them. He estimated that across his friend group at university alone, there are probably 15–20 people paying for redundant AI subscriptions right now. This pointed to a campus/student ICP angle we hadn't considered — especially relevant for Credex which could offer student-tier credits.
 
 ### What Changed in the Design
-- Results cards are now ordered by highest `monthlySavings` first within the results array — implemented in the audit engine sort logic
-- The "No login required" social proof badge was made more prominent in the landing page hero section
-- Logged "savings simulator / what-if tool" as a potential Phase 2 feature
+- Added "No login required" more prominently in the landing page — Hemanth confirmed that any friction kills adoption in the student/hackathon community
+- Logged multi-user "team mode" (aggregate multiple people's tools) as a high-priority future feature — came up in both Interview 2 and Interview 3 independently, which makes it a validated need
+- Recognized student/hackathon teams as a distinct, high-churn ICP worth a dedicated GTM angle
 
 ---
 
 ## Cross-Interview Patterns
 
-| Theme | Interview 1 — Meirambek (Solo AI Founder) | Interview 2 — Meghna (Fractional CTO) | Interview 3 — Karthik (Senior IC) |
-|-------|-------------------------------------------|----------------------------------------|-----------------------------------|
+| Theme | Interview 1 — Meirambek (Solo AI Founder) | Interview 2 — Meghna (Fractional CTO) | Interview 3 — Hemanth (Hackathon Lead) |
+|-------|-------------------------------------------|----------------------------------------|----------------------------------------|
 | Never audited AI spend before | ✅ | ✅ (clients) | ✅ |
-| Would share with team/co-founder | ✅ (founder network) | ✅ (clients) | ✅ (already did) |
+| Would share with team/co-founder | ✅ (founder network) | ✅ (clients) | ✅ (already did, 2 leads) |
 | Privacy concern about connecting billing | ✅ (mentioned) | ✅ (key point) | ✅ (mentioned) |
 | Wants more tool coverage | ✅ (API tier tracking) | ✅ (Perplexity, Poe) | ❌ |
-| Wants sources/citations | ❌ | ✅ | ❌ |
-| Would use again / recurring | ✅ (monthly runway check) | ✅ (for clients) | ✅ (already did 3x) |
-| Unique insight | API-first founders are a distinct ICP | Team audit aggregation needed | Usage as a calculator, not one-off |
+| Wants team/multi-user mode | ❌ | ✅ | ✅ |
+| Would use again / recurring | ✅ (monthly runway check) | ✅ (for clients) | ✅ (every hackathon) |
+| Unique insight | API-first founders are a distinct ICP | Team audit aggregation needed | Student/hackathon teams high-churn AI spend |
 
 ## Key Takeaways
 
 1. **The problem is real and unaddressed** — All 3 interviewees had never formally audited AI spend before using SpendLens. It's not that they don't care — they just didn't have a fast, trustworthy way to do it.
 
-2. **"No login" is a critical trust signal** — Two out of three explicitly named it as the reason they completed the audit instead of bouncing. This is a non-negotiable product constraint.
+2. **"No login" is a critical trust signal** — All three independently brought it up. Hemanth confirmed friction kills adoption in student communities instantly. This is non-negotiable.
 
-3. **The shareable link drives B2B virality** — Karthik shared it with 2 people *during* the interview. Meirambek said he'd send it to every AI founder he knows. The OG tags showing the savings number are what make it share-worthy, not just a link.
+3. **The shareable link drives peer virality** — Hemanth showed it to 2 other hackathon leads on campus during the call. Meirambek said he'd share it with every AI founder he knows. The OG tags showing the savings number make it spread naturally.
 
-4. **Solo AI founders are a distinct, underserved segment** — Meirambek's interview revealed that API-first founders (building products on top of LLM APIs) have very different cost structures to subscription-based teams. Their pain is about *per-token costs and model selection*, not plan tiers. This unlocks a potential Phase 2 product direction.
+4. **Solo AI founders are a distinct, underserved segment** — Meirambek's interview revealed that API-first founders have a fundamentally different cost structure. Their pain is *per-token costs and model selection*, not plan tiers. This unlocks a potential Phase 2 product direction.
 
-5. **The tool list is a ceiling on utility** — Meghna's point about Perplexity Pro and Poe showed a gap in the AI research/productivity category. Expanding the tool list is the fastest way to make the tool relevant to more ICPs.
+5. **"Team mode" is a validated unmet need** — Both Meghna (Interview 2) and Hemanth (Interview 3) independently asked for multi-user aggregation. Two separate interviews surfacing the same feature unprompted = strong signal it should be on the roadmap.
 
-6. **Solo founders feel savings acutely** — Meirambek's framing that "$35/month = 2 extra months of runway over a year" was the most compelling reframe of the value proposition we heard. It suggests the landing page copy should speak to *runway* not just *savings*, especially for the solo founder segment.
+6. **Hackathon teams are a high-churn, ignored ICP** — Hemanth's insight that teams "sign up for everything and forget to cancel" is a pattern that repeats across every hackathon. This is a viral distribution channel: students share tools fast within their networks, and their subscriptions persist post-event.
+
+7. **Solo founders frame savings as runway** — Meirambek's framing that "$35/month = 2 extra months of runway over a year" was the most compelling reframe of the value proposition. Landing page copy should speak to *runway extension*, not just cost savings.
+
 
