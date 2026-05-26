@@ -41,6 +41,10 @@ interface LeadCaptureFormProps {
   shareToken?: string;
   onShareTokenReceived?: (token: string) => void;
   isHighValueContext: boolean; // savings > 500
+  // Pass full results so /api/leads can create a shared_audits snapshot
+  results?: unknown[];
+  useCase?: string;
+  aiSummary?: string;
 }
 
 export default function LeadCaptureForm({
@@ -51,6 +55,9 @@ export default function LeadCaptureForm({
   shareToken: externalShareToken,
   onShareTokenReceived,
   isHighValueContext,
+  results,
+  useCase,
+  aiSummary,
 }: LeadCaptureFormProps) {
   const [submitted, setSubmitted] = useState(false);
   const [shareToken, setShareToken] = useState<string | null>(externalShareToken ?? null);
@@ -77,6 +84,10 @@ export default function LeadCaptureForm({
           totalMonthlySavings,
           totalAnnualSavings,
           toolCount,
+          // Pass full audit data so shared_audits snapshot is populated
+          results: results || [],
+          useCase: useCase || 'general',
+          aiSummary: aiSummary || '',
           website: data.website || '', // honeypot
         }),
       });

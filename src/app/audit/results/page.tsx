@@ -269,6 +269,9 @@ export default function ResultsPage() {
             toolCount={data.results.length}
             isHighValueContext={isHighValue}
             onShareTokenReceived={(token) => setShareToken(token)}
+            results={data.results}
+            useCase={data.formData?.useCase}
+            aiSummary={data.aiSummary}
           />
         </div>
 
