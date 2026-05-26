@@ -1,43 +1,55 @@
-# AI Spend Audit Tool
+# SpendLens — AI Spend Audit Tool
 
-> **Mint.com for AI tool costs** — a free web app where startup founders and engineering managers audit their AI subscriptions and see exactly where they're overspending.
+> **"Mint for AI tool costs"** — a free web app where startup founders and engineering managers audit their AI subscriptions in 2 minutes and see exactly where they're overspending.
 
-[![CI](https://github.com/your-username/credex-ai-audit/actions/workflows/ci.yml/badge.svg)](https://github.com/your-username/credex-ai-audit/actions)
-[![Live Demo](https://img.shields.io/badge/Live-Demo-7c3aed?style=flat)](https://credex-ai-audit.vercel.app)
+[![CI](https://github.com/Sohan-ss-29/SpendLens/actions/workflows/ci.yml/badge.svg)](https://github.com/Sohan-ss-29/SpendLens/actions)
 
 ---
 
 ## 🚀 Live Demo
 
-**[credex-ai-audit.vercel.app](https://credex-ai-audit.vercel.app)** ← Try it here
+**[SpendLens on Vercel →](https://spend-lens.vercel.app)** *(deployed — try the full flow)*
 
 ---
 
-## What It Does
+## What It Does (End-to-End)
 
-1. **Input** your team's AI tools (Cursor, GitHub Copilot, Claude, ChatGPT, Gemini, Windsurf, and API usage)
-2. **Audit Engine** checks: plan fit for team size, cheaper same-vendor alternatives, cross-vendor switches, Credex credit opportunities
-3. **Results Page** shows: total monthly/annual savings, per-tool recommendations, AI-written summary
-4. **Lead Capture** (optional, shown after results): email for Credex follow-up
-5. **Shareable URL**: public `/audit/[token]` link with OG tags for LinkedIn/Twitter sharing
+1. **Input** your team's AI tools (Cursor, GitHub Copilot, Claude, ChatGPT, Gemini, Windsurf, OpenAI API, Anthropic API) — plan, seats, monthly spend
+2. **Audit Engine** checks: plan fit for team size, cheaper same-vendor alternatives, cross-vendor switches (e.g., "you have both Cursor Pro and GitHub Copilot — that's redundant for a coding team"), and Credex credit opportunities
+3. **Results Page** shows: total monthly/annual savings hero, per-tool recommendations, AI-written 100-word summary (Claude Haiku)
+4. **Lead Capture** (optional, shown *after* results — spec requirement): email for permanent audit link + Credex follow-up for high-savings cases
+5. **Shareable URL**: public `/audit/[token]` with Open Graph + Twitter Card tags — the viral loop
+
+No login. No account. No credit card. 2 minutes.
 
 ---
 
+## Screenshots
+
+> *Run the audit at the live URL and screenshot your results — the savings hero number is the shareable moment.*
+
+**Audit Input Form** — Tool picker grid with 8 AI tools, auto-calculates spend from plan × seats, localStorage persistence across reloads.
+
+**Results Page** — Big savings number, per-tool breakdown cards with badges (✓ Optimal / ↓ Downgrade / ⚠ Redundant), AI summary panel.
+
+**Shareable URL** — `/audit/[token]` public page strips PII (no email/company shown), displays tools + savings, OG tags for clean LinkedIn/Twitter previews.
+
+---
 
 ## Tech Stack
 
 | Layer | Tech | Why |
 |-------|------|-----|
-| Frontend | Next.js 14 (App Router) + TypeScript | SSR for OG tags, file routing, built-in API routes |
-| Styling | Tailwind CSS + shadcn/ui | Fast, accessible, fully customizable |
-| Database | Supabase (Postgres) | Free tier, JSONB for flexible audit storage |
-| Email | Resend | Simplest transactional email, great DX |
-| AI Summary | Anthropic claude-haiku-3 | Assignment preference, ~$0.0002/audit |
-| Rate Limiting | Upstash Redis | Serverless, free tier, IP-based limiting |
-| Deployment | Vercel | Zero-config Next.js, instant deploys |
-| CI | GitHub Actions | Lint + type-check + tests on every push |
+| Frontend | Next.js (App Router) + TypeScript | SSR for OG tags; `generateMetadata()` is clean |
+| Styling | Vanilla CSS with custom design system | Full control, no dependency on component library opinions |
+| Database | Supabase (Postgres + JSONB) | Free tier, flexible schema, Row Level Security |
+| Email | Resend | Simplest transactional email DX; free tier covers launch |
+| AI Summary | Anthropic claude-3-5-haiku-20241022 | Assignment preference; graceful fallback if API is down |
+| Rate Limiting | In-memory sliding window (Upstash Redis upgrade path) | Works locally; env var swap for production |
+| Deployment | Vercel | Zero-config Next.js; instant preview deploys |
+| CI | GitHub Actions | Type-check + tests + build on every push to main |
 
-See [ARCHITECTURE.md](./ARCHITECTURE.md) for full reasoning.
+See [ARCHITECTURE.md](./ARCHITECTURE.md) for full reasoning and Mermaid system diagram.
 
 ---
 
@@ -46,56 +58,60 @@ See [ARCHITECTURE.md](./ARCHITECTURE.md) for full reasoning.
 ### Prerequisites
 - Node.js 18+
 - npm 9+
-- A [Supabase](https://supabase.com) project
-- An [Anthropic](https://console.anthropic.com) API key
-- A [Resend](https://resend.com) API key
-- An [Upstash](https://upstash.com) Redis database
+
+**Works locally without any API keys** — uses a local JSON file database (`.local-db.json`) and saves emails to `.local-emails/` directory.
 
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/your-username/credex-ai-audit.git
-cd credex-ai-audit
+git clone https://github.com/Sohan-ss-29/SpendLens.git
+cd SpendLens
 npm install
 ```
 
-### 2. Set up environment variables
+### 2. (Optional) Set up environment variables for real integrations
 
 ```bash
 cp .env.local.example .env.local
-# Edit .env.local with your keys
+# Fill in NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, ANTHROPIC_API_KEY, RESEND_API_KEY
 ```
 
-### 3. Set up Supabase
+Without these, the app uses local fallbacks — audit engine runs fully, AI summary falls back to a template, and data is saved locally.
 
-Run the SQL in `src/lib/supabase.ts` (in the comments) in your Supabase SQL Editor.
-
-### 4. Run locally
+### 3. Run locally
 
 ```bash
 npm run dev
 # Open http://localhost:3000
 ```
 
-### 5. Run tests
+### 4. Run tests
 
 ```bash
 npm test
+# 37 tests, ~520ms
+```
+
+### 5. Build check
+
+```bash
+npm run build
+# Must pass clean — checked by CI on every push
 ```
 
 ---
 
-## Key Technical Decisions
+## Key Decisions
 
-1. **JSONB over normalized tables** for audit data — tool list evolves frequently, queries never need per-tool joins. See [ARCHITECTURE.md](./ARCHITECTURE.md#backend-db-supabase).
+1. **JSONB over normalized tables for audit data** — Tool list evolves frequently (new vendors, new plans). JSONB lets us store arbitrary tool arrays without schema migrations. We never query by individual tool — only by `audit_id` — so there's no join penalty. See [ARCHITECTURE.md](./ARCHITECTURE.md).
 
-2. **nanoid over UUID for share tokens** — 21-char URL-safe strings are cleaner than 36-char UUIDs in shareable URLs (e.g., `/audit/V1StGXR8_Z5jdHi6B-myT`).
+2. **nanoid(21) over UUID for share tokens** — UUIDs are 36 chars with hyphens. nanoid(21) is URL-safe, 21 chars, and has equivalent collision resistance. `/audit/V1StGXR8_Z5jdHi6B-myT` is a much better shareable URL than a UUID. Changing this later would require a migration; chose correctly upfront.
 
-3. **App Router over Pages Router** — `generateMetadata()` for OG tags on shareable URLs is clean and first-class in App Router. Pages Router `_document.js` approach was too hacky.
+3. **Audit engine as pure functions, not an LLM** — The spec says "knowing when not to use AI is part of the test." The audit logic is deterministic, needs to be defensible to a finance person, and must be testable. Hardcoded rules with sourced pricing data (PRICING_DATA.md) is the right architecture. LLM is used only for the 100-word narrative summary where imprecision is acceptable.
 
-4. **Graceful AI summary fallback** — If Anthropic API fails, the summary falls back to a template string. Users never see an error.
+4. **Lead capture shown after results, not before** — The spec is explicit. But there's also a product reason: showing value before asking for email dramatically increases conversion. A user who sees "$340/month savings" is far more motivated to give their email than one who sees a form before any results.
 
-5. **Lead capture shown after results** — Spec is explicit: never gate results behind email. This increases conversion because users see value before committing.
+5. **Local JSON fallback instead of requiring API keys** — Requiring every reviewer to set up Supabase, Resend, and Anthropic accounts to run locally would kill the "quick start" experience. The local JSON DB and `.local-emails/` directory make the full flow demonstrable without any external services. The production app uses real Supabase + Resend when env vars are present.
 
 ---
 
@@ -105,26 +121,20 @@ npm test
 |------|--------|
 | README.md | ✅ |
 | ARCHITECTURE.md | ✅ |
-| DEVLOG.md | ✅ (Day 1 complete) |
-| REFLECTION.md | 🔲 Day 7 |
-| TESTS.md | 🔲 Day 3+ |
-| PRICING_DATA.md | 🔲 Day 3 |
-| PROMPTS.md | 🔲 Day 4 |
-| GTM.md | 🔲 Day 6 |
-| ECONOMICS.md | 🔲 Day 6 |
-| USER_INTERVIEWS.md | 🔲 Day 6 |
-| LANDING_COPY.md | 🔲 Day 6 |
-| METRICS.md | 🔲 Day 6 |
+| DEVLOG.md | ✅ — 7 days |
+| REFLECTION.md | ✅ |
+| TESTS.md | ✅ |
+| PRICING_DATA.md | ✅ |
+| PROMPTS.md | ✅ |
+| GTM.md | ✅ |
+| ECONOMICS.md | ✅ |
+| USER_INTERVIEWS.md | ✅ |
+| LANDING_COPY.md | ✅ |
+| METRICS.md | ✅ |
 | .github/workflows/ci.yml | ✅ |
-
----
-
-## Development Log
-
-See [DEVLOG.md](./DEVLOG.md) for daily entries.
 
 ---
 
 ## License
 
-MIT — built for the Credex entrepreneurial assignment.
+MIT — built for the Credex Web Development Intern assignment (Round 1).
